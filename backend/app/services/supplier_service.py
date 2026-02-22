@@ -1,0 +1,211 @@
+"""Supplier service layer."""
+from __future__ import annotations
+
+import logging
+from typing import Optional
+from sqlalchemy import or_, text
+from sqlalchemy.orm import Session
+
+from app.core.exceptions import NotFoundError
+from app.models.category import Category
+from app.models.supplier import Supplier, SupplierService
+from app.models.user import User
+from app.schemas.supplier_schema import SupplierCreate, SupplierServiceCreate, SupplierServiceUpdate
+
+
+logger = logging.getLogger(__name__)
+
+
+def sync_supplier_id_sequence(db: Session) -> None:
+    if db.bind is None or db.bind.dialect.name != "postgresql":
+        return
+    db.execute(
+        text(
+            "SELECT setval(pg_get_serial_sequence('suppliers', 'id'), "
+            "COALESCE((SELECT MAX(id) FROM suppliers), 0) + 1, false)"
+        )
+    )
+
+
+def seed_default_categories(db: Session) -> None:
+    defaults = [
+        "Construction Materials",
+        "Heavy Vehicles",
+        "Transport Vehicles",
+        "Equipment Rentals",
+    ]
+    for name in defaults:
+        exists = db.query(Category).filter(Category.name == name).first()
+        if not exists:
+            db.add(Category(name=name))
+            logger.info("Default category seeded name=%s", name)
+    db.commit()
+
+
+def create_supplier_profile(db: Session, user: User, payload: SupplierCreate) -> Supplier:
+    supplier_id = None
+    if db.bind is not None and db.bind.dialect.name == "postgresql":
+        sync_supplier_id_sequence(db)
+        supplier_id = db.execute(
+            text("SELECT nextval(pg_get_serial_sequence('suppliers', 'id'))")
+        ).scalar_one()
+
+    supplier = Supplier(
+        id=int(supplier_id) if supplier_id is not None else None,
+        user_id=user.id,
+        business_name=payload.business_name,
+        phone=payload.phone,
+        address=payload.address,
+        approved=False,
+        blocked=False,
+    )
+    db.add(supplier)
+    db.commit()
+    db.refresh(supplier)
+    logger.info("Supplier profile created user_id=%s supplier_id=%s", user.id, supplier.id)
+    return supplier
+
+
+def latest_supplier_profile_for_user(db: Session, user_id: int) -> Supplier | None:
+    return (
+        db.query(Supplier)
+        .filter(Supplier.user_id == user_id)
+        .order_by(Supplier.id.desc())
+        .first()
+    )
+
+
+def supplier_ids_for_user(db: Session, user_id: int) -> list[int]:
+    rows = db.query(Supplier.id).filter(Supplier.user_id == user_id).all()
+    return [row[0] for row in rows]
+
+
+def list_supplier_profiles_for_user(db: Session, user: User) -> list[Supplier]:
+    if user.role == "admin":
+        return db.query(Supplier).order_by(Supplier.id.desc()).all()
+    return (
+        db.query(Supplier)
+        .filter(Supplier.user_id == user.id)
+        .order_by(Supplier.id.desc())
+        .all()
+    )
+
+
+def update_supplier_profile(db: Session, user: User, supplier_id: int, payload: SupplierCreate) -> Supplier:
+    query = db.query(Supplier).filter(Supplier.id == supplier_id)
+    if user.role != "admin":
+        query = query.filter(Supplier.user_id == user.id)
+    supplier = query.first()
+    if not supplier:
+        raise NotFoundError("Supplier profile not found")
+
+    supplier.business_name = payload.business_name
+    supplier.phone = payload.phone
+    supplier.address = payload.address
+    db.commit()
+    db.refresh(supplier)
+    logger.info("Supplier profile updated user_id=%s supplier_id=%s", user.id, supplier.id)
+    return supplier
+
+
+def add_supplier_service(db: Session, user: User, payload: SupplierServiceCreate) -> SupplierService:
+    supplier = latest_supplier_profile_for_user(db, user.id)
+    if not supplier:
+        raise NotFoundError("Supplier profile not found")
+
+    category = db.query(Category).filter(Category.id == payload.category_id).first()
+    if not category:
+        raise NotFoundError("Invalid category")
+
+    service = SupplierService(
+        supplier_id=supplier.id,
+        category_id=payload.category_id,
+        price=payload.price,
+        availability=payload.availability,
+    )
+    db.add(service)
+    db.commit()
+    db.refresh(service)
+    logger.info(
+        "Supplier service added supplier_id=%s category_id=%s service_id=%s",
+        supplier.id,
+        payload.category_id,
+        service.id,
+    )
+    return service
+
+
+def list_supplier_services_for_user(db: Session, user: User) -> list[SupplierService]:
+    if user.role == "admin":
+        return db.query(SupplierService).order_by(SupplierService.id.desc()).all()
+
+    ids = supplier_ids_for_user(db, user.id)
+    if not ids:
+        return []
+    return (
+        db.query(SupplierService)
+        .filter(SupplierService.supplier_id.in_(ids))
+        .order_by(SupplierService.id.desc())
+        .all()
+    )
+
+
+def update_supplier_service(
+    db: Session,
+    user: User,
+    service_id: int,
+    payload: SupplierServiceUpdate,
+) -> SupplierService:
+    query = db.query(SupplierService).filter(SupplierService.id == service_id)
+    if user.role != "admin":
+        ids = supplier_ids_for_user(db, user.id)
+        if not ids:
+            raise NotFoundError("Supplier profile not found")
+        query = query.filter(SupplierService.supplier_id.in_(ids))
+    service = query.first()
+    if not service:
+        raise NotFoundError("Supplier service not found")
+
+    if payload.category_id is not None:
+        category = db.query(Category).filter(Category.id == payload.category_id).first()
+        if not category:
+            raise NotFoundError("Invalid category")
+        service.category_id = payload.category_id
+
+    if payload.price is not None:
+        service.price = payload.price
+
+    if payload.availability is not None:
+        service.availability = payload.availability
+
+    db.commit()
+    db.refresh(service)
+    logger.info("Supplier service updated user_id=%s service_id=%s", user.id, service.id)
+    return service
+
+
+def search_suppliers(
+    db: Session,
+    category_id: Optional[int] = None,
+    query_text: Optional[str] = None,
+) -> list[Supplier]:
+    query = db.query(Supplier).filter(Supplier.approved.is_(True), Supplier.blocked.is_(False))
+    if query_text:
+        term = f"%{query_text.strip()}%"
+        query = query.filter(
+            or_(
+                Supplier.business_name.ilike(term),
+                Supplier.address.ilike(term),
+                Supplier.phone.ilike(term),
+            )
+        )
+    if category_id is None:
+        return query.order_by(Supplier.id.asc()).all()
+
+    return (
+        query.join(SupplierService, Supplier.id == SupplierService.supplier_id)
+        .filter(SupplierService.category_id == category_id)
+        .distinct()
+        .order_by(Supplier.id.asc())
+        .all()
+    )

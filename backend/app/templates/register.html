@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<section class="mx-auto grid max-w-5xl gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+  <article class="gh-glass-card rounded-3xl p-6 sm:p-8">
+    <h2 data-ui-i18n="register_title" class="font-display mb-1 text-2xl font-bold text-slate-900">नया अकाउंट बनाएं</h2>
+    <p data-ui-i18n="register_desc" class="mb-5 text-sm text-slate-600">एक बार रजिस्टर करें और सप्लायर खोज व बुकिंग शुरू करें।</p>
+    <div class="space-y-4">
+      <div>
+        <label data-ui-i18n="register_name_label" for="regName" class="mb-1 block text-sm font-semibold text-slate-700">पूरा नाम</label>
+        <input id="regName" data-ui-placeholder="register_name_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="अपना पूरा नाम लिखें" />
+      </div>
+      <div>
+        <label data-ui-i18n="register_email_label" for="regEmail" class="mb-1 block text-sm font-semibold text-slate-700">ईमेल</label>
+        <input id="regEmail" data-ui-placeholder="register_email_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="name@example.com" />
+      </div>
+      <div>
+        <label data-ui-i18n="register_password_label" for="regPassword" class="mb-1 block text-sm font-semibold text-slate-700">पासवर्ड</label>
+        <input id="regPassword" data-ui-placeholder="register_password_placeholder" type="password" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="नया पासवर्ड बनाएं" />
+      </div>
+      <div>
+        <label data-ui-i18n="register_role_label" for="regRole" class="mb-1 block text-sm font-semibold text-slate-700">भूमिका (Role)</label>
+        <select id="regRole" class="gh-input w-full rounded-xl px-3 py-2.5">
+          <option data-ui-option="register_role_user" value="user">User (ग्राहक)</option>
+          <option data-ui-option="register_role_supplier" value="supplier">Supplier (विक्रेता)</option>
+          <option data-ui-option="register_role_admin" value="admin">Admin (प्रशासन)</option>
+        </select>
+      </div>
+      <button onclick="registerUser()" class="w-full rounded-xl bg-brand-600 px-4 py-2.5 font-semibold text-white shadow-md transition hover:bg-brand-700"><span data-ui-i18n="register_button">रजिस्टर करें</span></button>
+    </div>
+    <pre id="registerResult" data-ui-i18n="result_waiting" class="gh-status-pre mt-4 hidden rounded-xl p-3 text-xs" aria-live="polite"></pre>
+    <p class="mt-4 text-sm text-slate-600"><span data-ui-i18n="register_has_account">पहले से अकाउंट है?</span> <a href="/login" data-ui-i18n="register_login_now" class="font-semibold text-brand-700 hover:underline">लॉगिन करें</a></p>
+  </article>
+
+  <article class="gh-brand-panel rounded-3xl p-6 sm:p-8">
+    <img src="/static/img/graminhub-mark.svg" alt="GraminHub logo" class="h-14 w-14 rounded-2xl shadow-md" />
+    <h1 data-ui-i18n="register_panel_title" class="font-display mt-4 text-3xl font-extrabold leading-tight text-white sm:text-4xl">अपने काम के हिसाब से सही भूमिका चुनें</h1>
+    <div class="mt-6 grid gap-3 text-sm">
+      <div class="rounded-2xl bg-white/15 p-3">
+        <p data-ui-i18n="register_panel_user_title" class="font-semibold text-white">User (ग्राहक)</p>
+        <p data-ui-i18n="register_panel_user_desc" class="mt-1 text-emerald-50">सप्लायर खोजें, बुकिंग बनाएं और तुरंत WhatsApp चैट शुरू करें।</p>
+      </div>
+      <div class="rounded-2xl bg-white/15 p-3">
+        <p data-ui-i18n="register_panel_supplier_title" class="font-semibold text-white">Supplier (विक्रेता)</p>
+        <p data-ui-i18n="register_panel_supplier_desc" class="mt-1 text-emerald-50">प्रोफाइल बनाएं, रेट सहित सेवाएं जोड़ें और बुकिंग संभालें।</p>
+      </div>
+      <div class="rounded-2xl bg-white/15 p-3">
+        <p data-ui-i18n="register_panel_admin_title" class="font-semibold text-white">Admin (प्रशासन)</p>
+        <p data-ui-i18n="register_panel_admin_desc" class="mt-1 text-emerald-50">सप्लायर अप्रूवल, नई कैटेगरी और पूरी गतिविधि मॉनिटर करें।</p>
+      </div>
+    </div>
+  </article>
+</section>
+{% endblock %}
