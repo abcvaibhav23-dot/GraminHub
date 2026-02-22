@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="GraminHub पर आप भरोसेमंद सप्लायर, वाहन और इक्विपमेंट रेंटल सेवाएं खोजकर तुरंत बुक कर सकते हैं।"
+    />
+    <title>{% block title %}GraminHub{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                50: "#ecfdf5",
+                100: "#d1fae5",
+                200: "#a7f3d0",
+                500: "#10b981",
+                600: "#059669",
+                700: "#047857",
+                900: "#064e3b",
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/static/css/styles.css" />
+  </head>
+  <body class="gh-body min-h-screen text-slate-900">
+    <header class="sticky top-0 z-40 border-b border-white/30 bg-white/75 backdrop-blur-md">
+      <nav class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-4">
+        <a href="/" class="group flex items-center gap-3">
+          <img src="/static/img/graminhub-mark.svg" alt="GraminHub logo" class="h-10 w-10 rounded-xl shadow-sm transition group-hover:rotate-3" />
+          <div class="leading-tight">
+            <p class="font-display text-lg font-extrabold tracking-tight text-brand-700">GraminHub</p>
+            <p data-ui-i18n="brand_network_tagline" class="text-xs text-slate-500">गांव-कस्बा सप्लायर नेटवर्क</p>
+          </div>
+        </a>
+        <div class="flex flex-wrap items-center gap-2 text-sm sm:gap-4">
+          <span id="navRole" class="rounded-full border border-brand-200 bg-brand-50 px-3 py-1 font-semibold text-brand-700">भूमिका: मेहमान</span>
+          <a id="navHome" href="/" data-ui-i18n="nav_home" class="rounded-full px-3 py-1.5 font-semibold text-slate-700 transition hover:bg-slate-100">होम</a>
+          <a id="navLogin" href="/login" data-ui-i18n="nav_login" class="rounded-full px-3 py-1.5 font-semibold text-slate-700 hover:bg-slate-100">लॉगिन</a>
+          <a id="navRegister" href="/register" data-ui-i18n="nav_register" class="rounded-full px-3 py-1.5 font-semibold text-slate-700 transition hover:bg-slate-100">रजिस्टर</a>
+          <button id="navProfile" onclick="openProfilePanel()" type="button" data-ui-i18n="nav_profile" class="hidden rounded-full px-3 py-1.5 font-semibold text-slate-700 transition hover:bg-slate-100">प्रोफाइल</button>
+          <a id="navDashboard" href="/supplier-dashboard" class="hidden rounded-full px-3 py-1.5 font-semibold text-slate-700 transition hover:bg-slate-100">डैशबोर्ड</a>
+          <button id="navLogout" onclick="logoutUser()" type="button" data-ui-i18n="nav_logout" class="hidden rounded-full border border-slate-300 bg-white px-3 py-1.5 font-semibold text-slate-700 transition hover:bg-slate-100">लॉगआउट</button>
+          <div class="flex items-center gap-1 rounded-full border border-slate-200 bg-white p-1 shadow-sm">
+            <button id="langHinglish" type="button" class="rounded-full border border-brand-200 bg-brand-50 px-2.5 py-1 text-[11px] font-semibold text-brand-700">हिंदी-इंग्लिश</button>
+            <button id="langEnglish" type="button" class="rounded-full border border-slate-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700">English</button>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-4 py-8 sm:py-10">
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="border-t border-slate-200/80 bg-white/70">
+      <div class="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-6 text-sm text-slate-600 sm:flex-row sm:items-center sm:justify-between">
+        <p data-ui-i18n="footer_tagline">तेज सप्लायर खोज, बुकिंग और WhatsApp कन्वर्जन के लिए बनाया गया प्लेटफॉर्म।</p>
+        <p>&copy; {{ year if year else 2026 }} GraminHub</p>
+      </div>
+    </footer>
+
+    <section id="profilePanel" class="fixed inset-0 z-50 hidden bg-slate-900/40 p-4 backdrop-blur-sm">
+      <div class="mx-auto mt-8 w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
+        <div class="mb-4 flex items-center justify-between gap-3">
+          <h2 data-ui-i18n="profile_title" class="font-display text-2xl font-bold text-slate-900">प्रोफाइल सेटिंग्स</h2>
+          <button onclick="closeProfilePanel()" type="button" data-ui-i18n="profile_close_btn" class="rounded-xl border border-slate-300 px-3 py-1.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">बंद करें</button>
+        </div>
+        <p data-ui-i18n="profile_desc" class="mb-4 text-sm text-slate-600">नाम, ईमेल और पासवर्ड अपडेट करें। यह विकल्प User, Supplier और Admin सभी के लिए है।</p>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label data-ui-i18n="profile_name_label" class="mb-1 block text-sm font-semibold text-slate-700" for="profileName">नाम</label>
+            <input id="profileName" data-ui-placeholder="profile_name_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="अपना नाम" />
+          </div>
+          <div>
+            <label data-ui-i18n="profile_email_label" class="mb-1 block text-sm font-semibold text-slate-700" for="profileEmail">ईमेल</label>
+            <input id="profileEmail" data-ui-placeholder="profile_email_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="name@example.com" />
+          </div>
+          <div class="sm:col-span-2">
+            <label data-ui-i18n="profile_password_label" class="mb-1 block text-sm font-semibold text-slate-700" for="profilePassword">नया पासवर्ड (optional)</label>
+            <input id="profilePassword" data-ui-placeholder="profile_password_placeholder" type="password" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="खाली छोड़ें अगर पासवर्ड नहीं बदलना" />
+          </div>
+        </div>
+        <div class="mt-4 flex flex-wrap gap-3">
+          <button onclick="saveMyProfile()" class="rounded-xl bg-brand-700 px-4 py-2.5 font-semibold text-white transition hover:bg-brand-900"><span data-ui-i18n="profile_save_btn">प्रोफाइल सेव करें</span></button>
+        </div>
+        <pre id="profileResult" data-ui-i18n="result_waiting" class="gh-status-pre mt-4 hidden rounded-xl p-4 text-xs" aria-live="polite"></pre>
+      </div>
+    </section>
+
+    <script src="/static/js/app.js"></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>
