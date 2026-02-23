@@ -304,6 +304,21 @@ Example production CORS:
 CORS_ORIGINS=https://graminhub.in,https://www.graminhub.in
 ```
 
+### Vercel Deployment Notes
+
+- This repo deploys via `vercel.json` with ASGI entrypoint `api/index.py`.
+- All routes are rewritten to FastAPI app, so `/`, `/login`, `/admin-dashboard`, APIs, and static assets resolve through the same backend function.
+- Root `requirements.txt` points to `backend/requirements.txt` for Vercel dependency install.
+- If `DATABASE_URL` is not set, app falls back to sqlite on `/tmp/graminhub.db` (non-persistent, demo-only).
+
+Recommended Vercel environment variables:
+
+- `DATABASE_URL` (production managed Postgres)
+- `JWT_SECRET_KEY` (strong secret)
+- `APP_ENV=production`
+- `DEBUG=0`
+- `CORS_ORIGINS=https://graminhub.in,https://www.graminhub.in`
+
 ## 15) Troubleshooting
 
 - Login returns `401`: demo seed missing, run `make db-seed-demo`
