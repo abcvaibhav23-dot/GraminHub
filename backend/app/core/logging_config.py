@@ -25,11 +25,6 @@ class JsonFormatter(logging.Formatter):
 
 
 def setup_logging() -> None:
-    log_file: Path = LOG_DIR / "app.log"
-    handler = RotatingFileHandler(log_file, maxBytes=2_000_000, backupCount=5)
-    handler.setLevel(logging.INFO)
-    handler.setFormatter(JsonFormatter())
-
     console = logging.StreamHandler()
     console.setLevel(logging.INFO)
     console.setFormatter(
@@ -42,11 +37,19 @@ def setup_logging() -> None:
             return True
 
     request_id_filter = RequestIdFilter()
-    handler.addFilter(request_id_filter)
     console.addFilter(request_id_filter)
 
     root = logging.getLogger()
     root.setLevel(logging.INFO)
     root.handlers.clear()
-    root.addHandler(handler)
     root.addHandler(console)
+
+    try:
+        log_file: Path = LOG_DIR / "app.log"
+        handler = RotatingFileHandler(log_file, maxBytes=2_000_000, backupCount=5)
+        handler.setLevel(logging.INFO)
+        handler.setFormatter(JsonFormatter())
+        handler.addFilter(request_id_filter)
+        root.addHandler(handler)
+    except OSError:
+        logging.getLogger(__name__).warning("File logging disabled: unable to write to %s", LOG_DIR)

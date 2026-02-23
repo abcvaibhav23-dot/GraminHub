@@ -20,7 +20,7 @@ class Settings:
     DEBUG: bool = os.getenv("DEBUG", "0") == "1"
     DATABASE_URL: str = os.getenv(
         "DATABASE_URL",
-        "postgresql+psycopg2://marketplace:marketplace@localhost:5432/marketplace",
+        "sqlite:////tmp/graminhub.db",
     )
     JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "change-me-in-env")
     JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
@@ -34,8 +34,13 @@ class Settings:
 
 settings = Settings()
 
-LOG_DIR = BASE_DIR / "logs"
-LOG_DIR.mkdir(parents=True, exist_ok=True)
+_default_log_dir = BASE_DIR / "logs"
+try:
+    _default_log_dir.mkdir(parents=True, exist_ok=True)
+    LOG_DIR = _default_log_dir
+except OSError:
+    LOG_DIR = Path("/tmp/graminhub-logs")
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 connect_args = {"check_same_thread": False} if settings.DATABASE_URL.startswith("sqlite") else {}
 engine = create_engine(settings.DATABASE_URL, connect_args=connect_args, future=True)
