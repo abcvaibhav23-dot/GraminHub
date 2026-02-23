@@ -23,7 +23,7 @@ router = APIRouter(prefix="/api/bookings", tags=["bookings"])
 @router.post("", response_model=BookingOut)
 def create_booking_endpoint(
     payload: BookingCreate,
-    current_user: User = Depends(require_roles("user", "supplier", "admin")),
+    current_user: User = Depends(require_roles("user", "admin")),
     db: Session = Depends(get_db),
 ) -> BookingOut:
     return create_booking(db, current_user, payload)
@@ -48,7 +48,7 @@ def create_guest_booking_endpoint(
 @router.post("/whatsapp", response_model=WhatsAppBookingOut)
 def create_whatsapp_booking_endpoint(
     payload: BookingCreate,
-    current_user: User = Depends(require_roles("user", "supplier", "admin")),
+    current_user: User = Depends(require_roles("user", "admin")),
     db: Session = Depends(get_db),
 ) -> WhatsAppBookingOut:
     booking, phone, whatsapp_url = create_whatsapp_booking(db, current_user, payload)

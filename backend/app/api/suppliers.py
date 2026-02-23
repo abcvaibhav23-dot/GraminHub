@@ -24,11 +24,13 @@ from app.schemas.supplier_schema import (
     SupplierServiceOut,
     SupplierServiceUpdate,
 )
+from app.schemas.user_schema import MessageResponse
 from app.services.call_service import log_supplier_call
 from app.services.review_service import create_or_update_review, list_supplier_reviews, rating_summary
 from app.services.supplier_service import (
     add_supplier_service,
     create_supplier_profile,
+    delete_supplier_service,
     list_supplier_profiles_for_user,
     list_supplier_services_for_user,
     search_suppliers,
@@ -50,10 +52,18 @@ def list_supplier_categories_endpoint(db: Session = Depends(get_db)) -> list[Cat
 def search_suppliers_endpoint(
     category_id: Optional[int] = Query(default=None),
     q: Optional[str] = Query(default=None, min_length=1),
+    keyword: Optional[str] = Query(default=None, min_length=1),
     db: Session = Depends(get_db),
 ) -> list[SupplierOut]:
-    suppliers = search_suppliers(db, category_id=category_id, query_text=q)
+    query_parts = [part.strip() for part in [q, keyword] if part and part.strip()]
+    combined_query = " ".join(query_parts) if query_parts else None
+    suppliers = search_suppliers(db, category_id=category_id, query_text=combined_query)
     for supplier in suppliers:
+        supplier.services = [
+            service
+            for service in supplier.services
+            if service.item_name and service.item_name.strip()
+        ]
         avg_rating, total_reviews = rating_summary(db, supplier.id)
         supplier.average_rating = round(avg_rating, 2)
         supplier.total_reviews = total_reviews
@@ -69,6 +79,11 @@ def get_supplier_details_endpoint(supplier_id: int, db: Session = Depends(get_db
     )
     if not supplier:
         raise NotFoundError("Supplier not found")
+    supplier.services = [
+        service
+        for service in supplier.services
+        if service.item_name and service.item_name.strip()
+    ]
     avg_rating, total_reviews = rating_summary(db, supplier.id)
     supplier.average_rating = round(avg_rating, 2)
     supplier.total_reviews = total_reviews
@@ -137,6 +152,16 @@ def update_supplier_service_endpoint(
     db: Session = Depends(get_db),
 ) -> SupplierServiceOut:
     return update_supplier_service(db, current_user, service_id, payload)
+
+
+@router.delete("/services/{service_id}", response_model=MessageResponse)
+def delete_supplier_service_endpoint(
+    service_id: int,
+    current_user: User = Depends(require_roles("supplier", "admin")),
+    db: Session = Depends(get_db),
+) -> MessageResponse:
+    delete_supplier_service(db, current_user, service_id)
+    return MessageResponse(message="Supplier service deleted")
 
 
 @router.get("/me/bookings", response_model=list[BookingOut])

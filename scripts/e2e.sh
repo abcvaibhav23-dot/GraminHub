@@ -27,28 +27,36 @@ json_get() {
   python3 -c "import json,sys; print(json.load(sys.stdin)['$key'])"
 }
 
+otp_login() {
+  local role="$1"
+  local phone="$2"
+  local name="$3"
+  local otp_resp
+
+  otp_resp="$(req POST /api/auth/otp/request "{\"phone\":\"${phone}\",\"role\":\"${role}\",\"name\":\"${name}\"}")"
+  local otp_code
+  otp_code="$(printf '%s' "$otp_resp" | json_get otp)"
+
+  req POST /api/auth/otp/verify "{\"phone\":\"${phone}\",\"role\":\"${role}\",\"otp\":\"${otp_code}\"}" | json_get access_token
+}
+
 echo "Running E2E against ${BASE_URL}"
 
-ADMIN_EMAIL="admin_${SUFFIX}@example.com"
-ADMIN_PASS="secret123"
-req POST /api/auth/register "{\"name\":\"Admin E2E\",\"email\":\"${ADMIN_EMAIL}\",\"password\":\"${ADMIN_PASS}\",\"role\":\"admin\"}" >/tmp/e2e_admin_reg.json
-ADMIN_TOKEN="$(req POST /api/auth/login "{\"email\":\"${ADMIN_EMAIL}\",\"password\":\"${ADMIN_PASS}\"}" | json_get access_token)"
+SUFFIX_TAIL="${SUFFIX: -6}"
+ADMIN_PHONE="9000000001"
+SUP_PHONE="9010${SUFFIX_TAIL}"
+USER_PHONE="9020${SUFFIX_TAIL}"
 
-SUP_EMAIL="supplier_${SUFFIX}@example.com"
-SUP_PASS="secret123"
-req POST /api/auth/register "{\"name\":\"Supplier E2E\",\"email\":\"${SUP_EMAIL}\",\"password\":\"${SUP_PASS}\",\"role\":\"supplier\"}" >/tmp/e2e_supplier_reg.json
-SUP_TOKEN="$(req POST /api/auth/login "{\"email\":\"${SUP_EMAIL}\",\"password\":\"${SUP_PASS}\"}" | json_get access_token)"
+ADMIN_TOKEN="$(otp_login admin "${ADMIN_PHONE}" "Admin E2E")"
+SUP_TOKEN="$(otp_login supplier "${SUP_PHONE}" "Supplier E2E")"
 
 SUP_PROFILE="$(req POST /api/suppliers/profile "{\"business_name\":\"E2E Materials\",\"phone\":\"9876543210\",\"address\":\"Industrial Area\"}" "$SUP_TOKEN")"
 SUP_ID="$(printf '%s' "$SUP_PROFILE" | json_get id)"
-req POST /api/suppliers/services "{\"category_id\":1,\"price\":1500,\"availability\":\"in stock\"}" "$SUP_TOKEN" >/tmp/e2e_service.json
+req POST /api/suppliers/services "{\"category_id\":1,\"item_name\":\"Aggregate\",\"item_details\":\"20mm crushed stone\",\"price\":1500,\"availability\":\"in stock\"}" "$SUP_TOKEN" >/tmp/e2e_service.json
 
 req POST "/api/admin/suppliers/${SUP_ID}/approve" "" "$ADMIN_TOKEN" >/tmp/e2e_approve.json
 
-USER_EMAIL="user_${SUFFIX}@example.com"
-USER_PASS="secret123"
-req POST /api/auth/register "{\"name\":\"User E2E\",\"email\":\"${USER_EMAIL}\",\"password\":\"${USER_PASS}\",\"role\":\"user\"}" >/tmp/e2e_user_reg.json
-USER_TOKEN="$(req POST /api/auth/login "{\"email\":\"${USER_EMAIL}\",\"password\":\"${USER_PASS}\"}" | json_get access_token)"
+USER_TOKEN="$(otp_login user "${USER_PHONE}" "User E2E")"
 
 SEARCH="$(req GET '/api/suppliers/search?category_id=1')"
 printf '%s' "$SEARCH" >/tmp/e2e_search.json

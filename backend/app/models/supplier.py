@@ -32,8 +32,14 @@ class SupplierService(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     supplier_id: Mapped[int] = mapped_column(ForeignKey("suppliers.id", ondelete="CASCADE"), nullable=False)
-    category_id: Mapped[int] = mapped_column(ForeignKey("categories.id", ondelete="CASCADE"), nullable=False)
-    price: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
+    category_id: Mapped[int | None] = mapped_column(ForeignKey("categories.id", ondelete="CASCADE"), nullable=True)
+    item_name: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    item_details: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    item_variant: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    photo_url_1: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    photo_url_2: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    photo_url_3: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    price: Mapped[float | None] = mapped_column(Numeric(10, 2), nullable=True)
     availability: Mapped[str] = mapped_column(String(120), nullable=False, default="available")
 
     supplier = relationship("Supplier", back_populates="services")

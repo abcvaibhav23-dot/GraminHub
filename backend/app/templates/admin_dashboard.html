@@ -6,50 +6,122 @@
   <p data-ui-i18n="admin_dash_desc" class="mt-2 max-w-3xl text-sm text-slate-200 sm:text-base">सप्लायर अप्रूवल, नई कैटेगरी और सभी बुकिंग गतिविधियां एक ही स्क्रीन से मैनेज करें।</p>
 </section>
 
-<section class="grid gap-6 lg:grid-cols-2">
-  <article class="gh-glass-card rounded-2xl p-6">
-    <h2 data-ui-i18n="admin_approval_title" class="font-display mb-1 text-xl font-bold text-slate-900">Supplier अप्रूवल</h2>
-    <p data-ui-i18n="admin_approval_desc" class="mb-4 text-sm text-slate-600">वेरिफिकेशन के बाद Supplier ID डालकर approve करें।</p>
-    <input id="approveSupplierId" data-ui-placeholder="admin_supplier_id_placeholder" class="gh-input mb-3 w-full rounded-xl px-3 py-2.5" type="number" placeholder="Supplier ID" />
-    <button onclick="approveSupplier()" class="rounded-xl bg-brand-700 px-4 py-2.5 font-semibold text-white transition hover:bg-brand-900"><span data-ui-i18n="admin_approve_btn">Approve करें</span></button>
-  </article>
-
-  <article class="gh-glass-card rounded-2xl p-6">
-    <h2 data-ui-i18n="admin_category_title" class="font-display mb-1 text-xl font-bold text-slate-900">नई Category जोड़ें</h2>
-    <p data-ui-i18n="admin_category_desc" class="mb-4 text-sm text-slate-600">मार्केटप्लेस विस्तार के लिए नई श्रेणी बनाएं।</p>
-    <input id="newCategoryName" data-ui-placeholder="admin_category_placeholder" class="gh-input mb-3 w-full rounded-xl px-3 py-2.5" placeholder="Category नाम" />
-    <button onclick="createCategory()" class="rounded-xl bg-blue-700 px-4 py-2.5 font-semibold text-white transition hover:bg-blue-900"><span data-ui-i18n="admin_category_btn">Category बनाएं</span></button>
-  </article>
-</section>
-
-<section class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-  <h2 data-ui-i18n="admin_block_title" class="font-display mb-1 text-xl font-bold text-slate-900">Supplier Block/Unblock</h2>
-  <p data-ui-i18n="admin_block_desc" class="mb-4 text-sm text-slate-600">खराब रेटिंग या खराब सेवा पर Supplier को block करें, सुधार होने पर unblock करें।</p>
-  <div class="flex flex-wrap gap-3">
-    <input id="blockSupplierId" data-ui-placeholder="admin_supplier_id_placeholder" class="gh-input w-56 rounded-xl px-3 py-2.5" type="number" placeholder="Supplier ID" />
-    <button onclick="blockSupplier()" class="rounded-xl bg-red-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-900"><span data-ui-i18n="admin_block_btn">Block करें</span></button>
-    <button onclick="unblockSupplier()" class="rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-900"><span data-ui-i18n="admin_unblock_btn">Unblock करें</span></button>
+<section class="gh-tab-shell" data-tab-group="admin-main">
+  <div class="gh-tab-list">
+    <button type="button" data-tab-button="admin-main" data-tab-target="admin-panel-operations" data-tab-default data-ui-i18n="admin_tab_operations" class="gh-tab-btn">Supplier Ops</button>
+    <button type="button" data-tab-button="admin-main" data-tab-target="admin-panel-config" data-ui-i18n="admin_tab_configuration" class="gh-tab-btn">Configuration</button>
+    <button type="button" data-tab-button="admin-main" data-tab-target="admin-panel-data" data-ui-i18n="admin_tab_data" class="gh-tab-btn">Data & Moderation</button>
   </div>
-</section>
 
-<section class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-  <h2 data-ui-i18n="admin_delete_title" class="font-display mb-1 text-xl font-bold text-slate-900">Delete Supplier/User</h2>
-  <p data-ui-i18n="admin_delete_desc" class="mb-4 text-sm text-slate-600">जरूरत होने पर Supplier ID या User ID हटाएं। यह action permanent है।</p>
-  <div class="flex flex-wrap gap-3">
-    <input id="deleteSupplierId" data-ui-placeholder="admin_supplier_id_placeholder" class="gh-input w-56 rounded-xl px-3 py-2.5" type="number" placeholder="Supplier ID" />
-    <button onclick="deleteSupplierById()" class="rounded-xl bg-rose-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-rose-900"><span data-ui-i18n="admin_delete_supplier_btn">Delete Supplier</span></button>
-  </div>
-  <div class="mt-3 flex flex-wrap gap-3">
-    <input id="deleteUserId" data-ui-placeholder="admin_user_id_placeholder" class="gh-input w-56 rounded-xl px-3 py-2.5" type="number" placeholder="User ID" />
-    <button onclick="deleteUserById()" class="rounded-xl bg-orange-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-900"><span data-ui-i18n="admin_delete_user_btn">Delete User</span></button>
-  </div>
-</section>
+  <div id="admin-panel-operations" data-tab-panel="admin-main">
+    <section class="grid gap-6 lg:grid-cols-2">
+      <article class="gh-glass-card rounded-2xl p-6">
+        <h2 data-ui-i18n="admin_approval_title" class="font-display mb-1 text-xl font-bold text-slate-900">Supplier अप्रूवल</h2>
+        <p data-ui-i18n="admin_approval_desc" class="mb-4 text-sm text-slate-600">वेरिफिकेशन के बाद Supplier ID डालकर approve करें।</p>
+        <input id="approveSupplierId" data-ui-placeholder="admin_supplier_id_placeholder" class="gh-input mb-3 w-full rounded-xl px-3 py-2.5" type="number" placeholder="Supplier ID" />
+        <button onclick="approveSupplier()" class="rounded-xl bg-brand-700 px-4 py-2.5 font-semibold text-white transition hover:bg-brand-900"><span data-ui-i18n="admin_approve_btn">Approve करें</span></button>
+      </article>
 
-<section class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-  <div class="flex flex-wrap gap-3">
-    <button onclick="loadPendingSuppliers()" class="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-black"><span data-ui-i18n="admin_pending_btn">Pending Suppliers</span></button>
-    <button onclick="loadAllBookings()" class="rounded-xl bg-slate-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-900"><span data-ui-i18n="admin_all_bookings_btn">सभी बुकिंग</span></button>
+      <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 data-ui-i18n="admin_block_title" class="font-display mb-1 text-xl font-bold text-slate-900">Supplier Block/Unblock</h2>
+        <p data-ui-i18n="admin_block_desc" class="mb-4 text-sm text-slate-600">खराब रेटिंग या खराब सेवा पर Supplier को block करें, सुधार होने पर unblock करें।</p>
+        <div class="flex flex-wrap gap-3">
+          <input id="blockSupplierId" data-ui-placeholder="admin_supplier_id_placeholder" class="gh-input w-56 rounded-xl px-3 py-2.5" type="number" placeholder="Supplier ID" />
+          <button onclick="blockSupplier()" class="rounded-xl bg-red-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-900"><span data-ui-i18n="admin_block_btn">Block करें</span></button>
+          <button onclick="unblockSupplier()" class="rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-900"><span data-ui-i18n="admin_unblock_btn">Unblock करें</span></button>
+        </div>
+      </article>
+    </section>
   </div>
-  <pre id="adminOutput" data-ui-i18n="result_waiting" class="gh-status-pre mt-3 hidden rounded-xl p-4 text-xs" aria-live="polite"></pre>
+
+  <div id="admin-panel-config" data-tab-panel="admin-main" class="hidden">
+    <section class="gh-glass-card rounded-2xl p-6">
+      <h2 data-ui-i18n="admin_category_title" class="font-display mb-1 text-xl font-bold text-slate-900">नई Category जोड़ें</h2>
+      <p data-ui-i18n="admin_category_desc" class="mb-4 text-sm text-slate-600">मार्केटप्लेस विस्तार के लिए नई श्रेणी बनाएं।</p>
+      <input id="newCategoryName" data-ui-placeholder="admin_category_placeholder" class="gh-input mb-3 w-full rounded-xl px-3 py-2.5" placeholder="Category नाम" />
+      <button onclick="createCategory()" class="rounded-xl bg-blue-700 px-4 py-2.5 font-semibold text-white transition hover:bg-blue-900"><span data-ui-i18n="admin_category_btn">Category बनाएं</span></button>
+    </section>
+  </div>
+
+  <div id="admin-panel-data" data-tab-panel="admin-main" class="hidden">
+    <section class="gh-tab-shell" data-tab-group="admin-data">
+      <div class="gh-tab-list">
+        <button type="button" data-tab-button="admin-data" data-tab-target="admin-data-pending" data-tab-default data-ui-i18n="admin_data_tab_pending" class="gh-tab-btn">Pending Suppliers</button>
+        <button type="button" data-tab-button="admin-data" data-tab-target="admin-data-bookings" data-ui-i18n="admin_data_tab_bookings" class="gh-tab-btn">All Bookings</button>
+        <button type="button" data-tab-button="admin-data" data-tab-target="admin-data-delete" data-ui-i18n="admin_data_tab_delete" class="gh-tab-btn">Delete IDs</button>
+      </div>
+
+      <div id="admin-data-pending" data-tab-panel="admin-data">
+        <button onclick="loadPendingSuppliers()" class="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-black"><span data-ui-i18n="admin_pending_btn">Pending Suppliers</span></button>
+      </div>
+
+      <div id="admin-data-bookings" data-tab-panel="admin-data" class="hidden">
+        <button onclick="loadAllBookings()" class="rounded-xl bg-slate-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-900"><span data-ui-i18n="admin_all_bookings_btn">सभी बुकिंग</span></button>
+      </div>
+
+      <div id="admin-data-delete" data-tab-panel="admin-data" class="hidden">
+        <section class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <h2 data-ui-i18n="admin_delete_title" class="font-display mb-1 text-xl font-bold text-slate-900">Delete Supplier/User</h2>
+          <p data-ui-i18n="admin_delete_desc" class="mb-4 text-sm text-slate-600">जरूरत होने पर Supplier ID या User ID हटाएं। यह action permanent है।</p>
+          <div class="flex flex-wrap gap-3">
+            <input id="deleteSupplierId" data-ui-placeholder="admin_supplier_id_placeholder" class="gh-input w-56 rounded-xl px-3 py-2.5" type="number" placeholder="Supplier ID" />
+            <button onclick="deleteSupplierById()" class="rounded-xl bg-rose-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-rose-900"><span data-ui-i18n="admin_delete_supplier_btn">Delete Supplier</span></button>
+          </div>
+          <div class="mt-3 flex flex-wrap gap-3">
+            <input id="deleteUserId" data-ui-placeholder="admin_user_id_placeholder" class="gh-input w-56 rounded-xl px-3 py-2.5" type="number" placeholder="User ID" />
+            <button onclick="deleteUserById()" class="rounded-xl bg-orange-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-900"><span data-ui-i18n="admin_delete_user_btn">Delete User</span></button>
+          </div>
+        </section>
+
+        <section class="mt-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <h2 class="font-display mb-1 text-xl font-bold text-slate-900">Manage Users (Create/Block/Unblock)</h2>
+          <p class="mb-4 text-sm text-slate-600">Admin नए Buyer/Supplier owner accounts बना सकता है और किसी user को block/unblock कर सकता है।</p>
+          <div class="grid gap-3 md:grid-cols-3">
+            <input id="managedUserName" class="gh-input rounded-xl px-3 py-2.5" placeholder="User name" />
+            <input id="managedUserPhone" class="gh-input rounded-xl px-3 py-2.5" placeholder="Phone number" />
+            <select id="managedUserRole" class="gh-input rounded-xl px-3 py-2.5">
+              <option value="user">Buyer/User</option>
+              <option value="supplier">Supplier Owner</option>
+            </select>
+          </div>
+          <div class="mt-3 flex flex-wrap gap-3">
+            <button onclick="createManagedUserByAdmin()" class="rounded-xl bg-indigo-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-900">Create/Update User</button>
+            <button onclick="loadUsersForAdmin()" class="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-black">Load All Users</button>
+          </div>
+          <div class="mt-4 flex flex-wrap gap-3">
+            <input id="blockUserId" class="gh-input w-56 rounded-xl px-3 py-2.5" type="number" placeholder="User ID" />
+            <button onclick="blockUserByAdmin()" class="rounded-xl bg-amber-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-900">Block User</button>
+            <button onclick="unblockUserByAdmin()" class="rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-900">Unblock User</button>
+          </div>
+        </section>
+
+        <section class="mt-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <h2 class="font-display mb-1 text-xl font-bold text-slate-900">Admin Add Supplier</h2>
+          <p class="mb-4 text-sm text-slate-600">Owner details + supplier profile देकर Admin सीधे approved supplier बना सकता है।</p>
+          <div class="grid gap-3 md:grid-cols-2">
+            <input id="managedSupplierOwnerName" class="gh-input rounded-xl px-3 py-2.5" placeholder="Owner name" />
+            <input id="managedSupplierOwnerPhone" class="gh-input rounded-xl px-3 py-2.5" placeholder="Owner phone" />
+            <input id="managedSupplierBusiness" class="gh-input rounded-xl px-3 py-2.5" placeholder="Business name" />
+            <input id="managedSupplierPhone" class="gh-input rounded-xl px-3 py-2.5" placeholder="Supplier contact phone" />
+            <input id="managedSupplierAddress" class="gh-input rounded-xl px-3 py-2.5 md:col-span-2" placeholder="Supplier address" />
+          </div>
+          <div class="mt-3">
+            <button onclick="createManagedSupplierByAdmin()" class="rounded-xl bg-teal-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-900">Create Approved Supplier</button>
+          </div>
+        </section>
+
+        <section class="mt-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <h2 class="font-display mb-1 text-xl font-bold text-slate-900">Delete Supplier Item Listing</h2>
+          <p class="mb-4 text-sm text-slate-600">Service/Item ID देकर किसी भी supplier की item listing हटाएं।</p>
+          <div class="flex flex-wrap gap-3">
+            <input id="adminDeleteServiceId" class="gh-input w-56 rounded-xl px-3 py-2.5" type="number" placeholder="Item/Service ID" />
+            <button onclick="deleteSupplierItemByAdmin()" class="rounded-xl bg-rose-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-rose-900">Delete Item</button>
+          </div>
+        </section>
+      </div>
+    </section>
+  </div>
+
+  <pre id="adminOutput" data-ui-i18n="result_waiting" class="gh-status-pre mt-4 hidden rounded-xl p-4 text-xs" aria-live="polite"></pre>
 </section>
 {% endblock %}

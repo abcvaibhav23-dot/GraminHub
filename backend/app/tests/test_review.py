@@ -16,6 +16,12 @@ def test_supplier_rating_flow(client):
     )
     assert profile.status_code == 200
     supplier_id = profile.json()["id"]
+    service = client.post(
+        "/api/suppliers/services",
+        json={"category_id": 1, "item_name": "Stone Chips", "price": 1500, "availability": "available"},
+        headers={"Authorization": f"Bearer {supplier_token}"},
+    )
+    assert service.status_code == 200
 
     admin_token = register_and_login(
         client,

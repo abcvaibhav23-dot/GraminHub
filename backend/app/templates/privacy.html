@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Privacy Note | GraminHub{% endblock %}
+{% block meta_description %}GraminHub privacy note: user data, booking details, and search data handling policy for marketplace usage.{% endblock %}
+{% block content %}
+<section class="max-w-4xl rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-sm">
+  <h1 class="font-display text-3xl font-extrabold text-slate-900">Privacy Note</h1>
+  <p class="mt-3 text-sm text-slate-700">
+    We keep privacy controls simple and practical. This note explains how login, booking, and search-related data is handled on GraminHub.
+  </p>
+
+  <div class="mt-5 space-y-4 text-sm text-slate-700">
+    <section class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+      <h2 class="font-semibold text-slate-900">1. Account data</h2>
+      <p class="mt-1">Name, email, and encrypted password are stored for authentication and role-based access (Guest/User/Supplier/Admin).</p>
+    </section>
+
+    <section class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+      <h2 class="font-semibold text-slate-900">2. Booking and supplier interactions</h2>
+      <p class="mt-1">Booking requests, ratings, and call logs are stored to run the marketplace workflow and support dispute resolution.</p>
+    </section>
+
+    <section class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+      <h2 class="font-semibold text-slate-900">3. Search keywords and SEO</h2>
+      <p class="mt-1">We maintain a broad keyword library to improve discoverability on search platforms. This keyword corpus is generic and not tied to personal user identity.</p>
+    </section>
+
+    <section class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+      <h2 class="font-semibold text-slate-900">4. User disclaimer (buyer-side risk controls)</h2>
+      <ul class="mt-1 list-disc space-y-1 pl-4">
+        <li>Users must provide genuine identity/contact details when placing booking requests.</li>
+        <li>Fake bookings, false payment claims, abusive calls/messages, or impersonation are treated as misuse.</li>
+        <li>On verified misuse, user access may be blocked and related logs may be shared with legal authorities when required by law.</li>
+      </ul>
+    </section>
+
+    <section class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+      <h2 class="font-semibold text-slate-900">5. Buyer disclaimer</h2>
+      <ul class="mt-1 list-disc space-y-1 pl-4">
+        <li>Buyers must verify supplier quality, material specs, and price before payment.</li>
+        <li>GraminHub acts as a discovery and booking platform and does not guarantee third-party supplier performance.</li>
+        <li>For large orders, buyers should use written confirmations and GST/legal invoices where applicable.</li>
+      </ul>
+    </section>
+
+    <section class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+      <h2 class="font-semibold text-slate-900">6. Supplier disclaimer</h2>
+      <ul class="mt-1 list-disc space-y-1 pl-4">
+        <li>Suppliers are responsible for lawful listings, correct pricing, and truthful availability.</li>
+        <li>Supplier contact data shown on the platform is intended only for business booking communication.</li>
+        <li>Repeated fraudulent activity, spam, or abuse may lead to profile block/removal by admin.</li>
+      </ul>
+    </section>
+
+    <section class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+      <h2 class="font-semibold text-slate-900">7. Support contact</h2>
+      <p class="mt-1">
+        Email: <a href="mailto:cba.vaibhav23@gmail.com" class="font-semibold text-brand-700 hover:underline">cba.vaibhav23@gmail.com</a><br />
+        Phone/WhatsApp: <a href="tel:+916362272078" class="font-semibold text-brand-700 hover:underline">+91-6362272078</a>
+      </p>
+    </section>
+  </div>
+</section>
+{% endblock %}

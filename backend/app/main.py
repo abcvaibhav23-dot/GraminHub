@@ -10,7 +10,7 @@ from uuid import uuid4
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import inspect, text
@@ -20,6 +20,7 @@ from app.core.config import Base, engine, settings, SessionLocal
 from app.core.exceptions import ServiceError
 from app.core.logging_config import setup_logging
 from app.core.request_context import set_request_id
+from app.core.seo_keywords import SEO_KEYWORDS, SEO_META_KEYWORDS
 from app.services.supplier_service import seed_default_categories, sync_supplier_id_sequence
 from app import models  # noqa: F401 - ensures model metadata is imported
 
@@ -91,6 +92,8 @@ async def request_context_middleware(request: Request, call_next):
 APP_DIR = Path(__file__).resolve().parent
 app.mount("/static", StaticFiles(directory=APP_DIR / "static"), name="static")
 templates = Jinja2Templates(directory=APP_DIR / "templates")
+templates.env.globals["seo_keywords_cloud"] = SEO_KEYWORDS
+templates.env.globals["seo_keywords_meta"] = SEO_META_KEYWORDS
 
 
 @app.on_event("startup")
@@ -124,6 +127,47 @@ def on_startup() -> None:
         with engine.begin() as conn:
             conn.execute(text("ALTER TABLE bookings ADD COLUMN guest_phone VARCHAR(30)"))
         logger.info("Schema updated: added bookings.guest_phone column")
+
+    user_columns = {col["name"] for col in inspector.get_columns("users")}
+    if "phone" not in user_columns:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE users ADD COLUMN phone VARCHAR(30)"))
+        logger.info("Schema updated: added users.phone column")
+    if "blocked" not in user_columns:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE users ADD COLUMN blocked BOOLEAN NOT NULL DEFAULT FALSE"))
+        logger.info("Schema updated: added users.blocked column")
+
+    supplier_service_columns = {col["name"] for col in inspector.get_columns("supplier_services")}
+    if "item_name" not in supplier_service_columns:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE supplier_services ADD COLUMN item_name VARCHAR(160)"))
+        logger.info("Schema updated: added supplier_services.item_name column")
+    if "item_details" not in supplier_service_columns:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE supplier_services ADD COLUMN item_details VARCHAR(500)"))
+        logger.info("Schema updated: added supplier_services.item_details column")
+    if "item_variant" not in supplier_service_columns:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE supplier_services ADD COLUMN item_variant VARCHAR(160)"))
+        logger.info("Schema updated: added supplier_services.item_variant column")
+    if "photo_url_1" not in supplier_service_columns:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE supplier_services ADD COLUMN photo_url_1 VARCHAR(500)"))
+        logger.info("Schema updated: added supplier_services.photo_url_1 column")
+    if "photo_url_2" not in supplier_service_columns:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE supplier_services ADD COLUMN photo_url_2 VARCHAR(500)"))
+        logger.info("Schema updated: added supplier_services.photo_url_2 column")
+    if "photo_url_3" not in supplier_service_columns:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE supplier_services ADD COLUMN photo_url_3 VARCHAR(500)"))
+        logger.info("Schema updated: added supplier_services.photo_url_3 column")
+
+    if engine.dialect.name == "postgresql":
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE supplier_services ALTER COLUMN category_id DROP NOT NULL"))
+            conn.execute(text("ALTER TABLE supplier_services ALTER COLUMN price DROP NOT NULL"))
 
     db = SessionLocal()
     try:
@@ -162,6 +206,12 @@ def register_page(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
 
 
+@app.get("/privacy")
+@app.get("/privacy-policy")
+def privacy_page(request: Request):
+    return templates.TemplateResponse("privacy.html", {"request": request})
+
+
 @app.get("/profile")
 @app.get("/profile/")
 @app.get("/account")
@@ -183,6 +233,33 @@ def admin_dashboard(request: Request):
 @app.get("/health")
 def health_check():
     return {"status": "ok", "app": settings.APP_NAME, "utc": datetime.utcnow().isoformat() + "Z"}
+
+
+@app.get("/robots.txt", include_in_schema=False)
+def robots_txt() -> PlainTextResponse:
+    content = (
+        "User-agent: *\n"
+        "Allow: /\n"
+        "Sitemap: https://graminhub.in/sitemap.xml\n"
+    )
+    return PlainTextResponse(content=content)
+
+
+@app.get("/sitemap.xml", include_in_schema=False)
+def sitemap_xml() -> Response:
+    urls = ["/", "/login", "/register", "/supplier-dashboard", "/admin-dashboard", "/privacy"]
+    lastmod = datetime.utcnow().date().isoformat()
+    body = "".join(
+        f"<url><loc>https://graminhub.in{path}</loc><lastmod>{lastmod}</lastmod></url>"
+        for path in urls
+    )
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        f"{body}"
+        "</urlset>"
+    )
+    return Response(content=xml, media_type="application/xml")
 
 
 app.include_router(auth.router)
