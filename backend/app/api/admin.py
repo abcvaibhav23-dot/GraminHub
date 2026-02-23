@@ -15,8 +15,11 @@ from app.models.category import Category
 from app.models.supplier import Supplier
 from app.models.user import User
 from app.schemas.booking_schema import BookingOut
+from app.schemas.supplier_schema import SupplierCreate
 from app.schemas.supplier_schema import SupplierOut
-from app.schemas.user_schema import MessageResponse
+from app.schemas.user_schema import MessageResponse, UserOut
+from app.services.supplier_service import create_supplier_profile, delete_supplier_service
+from app.services.user_service import get_or_create_phone_role_user, normalize_phone
 
 
 logger = logging.getLogger(__name__)
@@ -25,6 +28,20 @@ router = APIRouter(prefix="/api/admin", tags=["admin"])
 
 class CategoryCreate(BaseModel):
     name: str = Field(min_length=2, max_length=100)
+
+
+class ManagedUserCreate(BaseModel):
+    name: str = Field(min_length=2, max_length=120)
+    phone: str = Field(min_length=7, max_length=20)
+    role: str = Field(default="user")
+
+
+class ManagedSupplierCreate(BaseModel):
+    owner_name: str = Field(min_length=2, max_length=120)
+    owner_phone: str = Field(min_length=7, max_length=20)
+    business_name: str = Field(min_length=2, max_length=150)
+    supplier_phone: str = Field(min_length=7, max_length=30)
+    address: str = Field(min_length=5, max_length=300)
 
 
 def _get_supplier_or_404(db: Session, supplier_id: int) -> Supplier:
@@ -39,6 +56,70 @@ def _get_user_or_404(db: Session, user_id: int) -> User:
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
+
+@router.get("/users", response_model=list[UserOut])
+def list_users_endpoint(
+    _: User = Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+) -> list[UserOut]:
+    return db.query(User).order_by(User.id.asc()).all()
+
+
+@router.post("/users", response_model=UserOut)
+def create_managed_user_endpoint(
+    payload: ManagedUserCreate,
+    _: User = Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+) -> UserOut:
+    safe_role = payload.role.strip().lower()
+    if safe_role not in {"user", "supplier"}:
+        raise HTTPException(status_code=400, detail="Role must be user or supplier")
+
+    user = get_or_create_phone_role_user(
+        db,
+        phone=normalize_phone(payload.phone),
+        role=safe_role,
+        name=payload.name,
+    )
+    user.blocked = False
+    db.commit()
+    db.refresh(user)
+    logger.info("Managed user created/updated user_id=%s role=%s", user.id, user.role)
+    return user
+
+
+@router.post("/suppliers", response_model=SupplierOut)
+def create_managed_supplier_endpoint(
+    payload: ManagedSupplierCreate,
+    _: User = Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+) -> SupplierOut:
+    supplier_owner = get_or_create_phone_role_user(
+        db,
+        phone=normalize_phone(payload.owner_phone),
+        role="supplier",
+        name=payload.owner_name,
+    )
+    supplier_owner.blocked = False
+    db.commit()
+    db.refresh(supplier_owner)
+
+    supplier = create_supplier_profile(
+        db,
+        supplier_owner,
+        SupplierCreate(
+            business_name=payload.business_name,
+            phone=payload.supplier_phone,
+            address=payload.address,
+        ),
+    )
+    supplier.approved = True
+    supplier.blocked = False
+    db.commit()
+    db.refresh(supplier)
+    logger.info("Managed supplier created supplier_id=%s user_id=%s", supplier.id, supplier_owner.id)
+    return supplier
 
 
 @router.get("/pending-suppliers", response_model=list[SupplierOut])
@@ -125,6 +206,44 @@ def delete_user(
     db.commit()
     logger.info("User deleted: user_id=%s by_admin_id=%s", user_id, current_admin.id)
     return MessageResponse(message="User deleted")
+
+
+@router.post("/users/{user_id}/block", response_model=MessageResponse)
+def block_user(
+    user_id: int,
+    current_admin: User = Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+) -> MessageResponse:
+    if user_id == current_admin.id:
+        raise ConflictError("Admin cannot block own account")
+    user = _get_user_or_404(db, user_id)
+    user.blocked = True
+    db.commit()
+    logger.info("User blocked: user_id=%s by_admin_id=%s", user_id, current_admin.id)
+    return MessageResponse(message="User blocked")
+
+
+@router.post("/users/{user_id}/unblock", response_model=MessageResponse)
+def unblock_user(
+    user_id: int,
+    _: User = Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+) -> MessageResponse:
+    user = _get_user_or_404(db, user_id)
+    user.blocked = False
+    db.commit()
+    logger.info("User unblocked: user_id=%s", user_id)
+    return MessageResponse(message="User unblocked")
+
+
+@router.delete("/services/{service_id}", response_model=MessageResponse)
+def delete_supplier_item_by_service_id(
+    service_id: int,
+    current_admin: User = Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+) -> MessageResponse:
+    delete_supplier_service(db, current_admin, service_id)
+    return MessageResponse(message="Supplier item deleted")
 
 
 @router.post("/categories", response_model=MessageResponse)

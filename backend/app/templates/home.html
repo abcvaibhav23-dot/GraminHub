@@ -1,6 +1,36 @@
 {% extends "base.html" %}
 {% block title %}Home | GraminHub{% endblock %}
+{% block meta_description %}GraminHub पर ग्रामीण और कस्बाई क्षेत्रों के लिए verified सप्लायर, वाहन और equipment rentals खोजें, तुलना करें और WhatsApp पर तुरंत बुक करें।{% endblock %}
+{% block meta_keywords %}{{ seo_keywords_meta | default('graminhub,whatsapp booking,truck booking,cement supplier', true) }}{% endblock %}
 {% block content %}
+<section class="mb-6 border border-slate-200/70 rounded-2xl bg-white/90 backdrop-blur-sm">
+  <div class="mx-auto flex flex-wrap items-center gap-2 px-4 py-3">
+    <input
+      id="globalSearchInput"
+      data-ui-placeholder="global_search_placeholder"
+      class="gh-input min-w-[220px] flex-1 rounded-xl px-3 py-2.5"
+      placeholder="Keyword, sentence, or material name"
+    />
+    <button id="globalSearchBtn" onclick="runGlobalSearch()" class="rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">
+      <span data-ui-i18n="global_search_btn">Search</span>
+    </button>
+    <button id="globalVoiceBtn" onclick="startGlobalVoiceSearch()" class="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+      <span data-ui-i18n="global_voice_btn">Voice</span>
+    </button>
+  </div>
+  <div class="mx-auto px-4 pb-2">
+    <p id="globalSearchStatus" class="hidden text-xs font-semibold text-slate-600" aria-live="polite"></p>
+  </div>
+  <div class="mx-auto flex flex-wrap items-center gap-2 px-4 pb-3">
+    <span data-ui-i18n="global_tags_label" class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Quick tags:</span>
+    <button type="button" class="gh-tag-chip" onclick="applyQuickTag('cement')">#Cement</button>
+    <button type="button" class="gh-tag-chip" onclick="applyQuickTag('balu')">#Balu</button>
+    <button type="button" class="gh-tag-chip" onclick="applyQuickTag('sand')">#Sand</button>
+    <button type="button" class="gh-tag-chip" onclick="applyQuickTag('truck booking')">#Truck</button>
+    <button type="button" class="gh-tag-chip" onclick="applyQuickTag('travel booking')">#Travel</button>
+  </div>
+</section>
+
 <section class="gh-hero overflow-hidden rounded-3xl p-6 shadow-2xl sm:p-10">
   <div class="grid gap-8 lg:grid-cols-2 lg:items-center">
     <div class="relative z-10 animate-rise">
@@ -11,27 +41,25 @@
         अब गांव से ही सप्लायर, वाहन और रेंटल सेवा तुरंत बुक करें
       </h1>
       <p data-ui-i18n="home_desc" class="mt-4 max-w-2xl text-base text-emerald-50 sm:text-lg">
-        GraminHub पर Construction Materials, Heavy Vehicles, Transport Vehicles और Equipment Rentals जैसी सेवाएं एक ही जगह मिलती हैं।
+        GraminHub पर Book Vehicle, Building Materials और Agriculture सेवाएं एक ही जगह मिलती हैं।
       </p>
       <div class="mt-6 flex flex-wrap items-center gap-3 text-sm">
         <span class="rounded-full bg-white/20 px-4 py-2 font-semibold text-white"><span data-ui-i18n="home_logged_in_as">लॉगिन यूज़र:</span> <span id="currentUserName">मेहमान</span></span>
         <span data-ui-i18n="home_booking_mode" class="rounded-full bg-white/20 px-4 py-2 font-semibold text-white">बुकिंग: Call + WhatsApp</span>
+        <span data-ui-i18n="home_verified_chip" class="rounded-full bg-amber-400/90 px-4 py-2 font-semibold text-slate-900">Verified local network</span>
       </div>
     </div>
     <div class="relative animate-rise delay-1">
       <div class="gh-glass-card rounded-2xl p-5 sm:p-6">
         <h2 data-ui-i18n="home_search_title" class="font-display text-xl font-bold text-slate-900">तुरंत खोजें और बुक करें</h2>
-        <p data-ui-i18n="home_search_desc" class="mt-1 text-sm text-slate-600">Category चुनें, अपनी जरूरत लिखें, सप्लायर खोजें और WhatsApp से बुकिंग शुरू करें।</p>
+        <p data-ui-i18n="home_search_desc" class="mt-1 text-sm text-slate-600">ऊपर top search bar में keyword, sentence या voice input देकर तुरंत सप्लायर खोजें।</p>
         <div class="mt-4 grid gap-3">
-          <label data-ui-i18n="home_category_label" class="text-sm font-semibold text-slate-700" for="categorySelect">श्रेणी (Category)</label>
-          <select id="categorySelect" class="gh-input w-full rounded-xl px-3 py-2.5"></select>
-          <label data-ui-i18n="home_query_label" class="text-sm font-semibold text-slate-700" for="supplierQuery">सप्लायर खोजें (नाम/स्थान/मोबाइल)</label>
-          <input id="supplierQuery" data-ui-placeholder="home_query_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="उदाहरण: Sonbhadra, JCB, 98765..." />
           <label data-ui-i18n="home_requirement_label" class="text-sm font-semibold text-slate-700" for="bookingDescription">आपकी जरूरत</label>
           <input id="bookingDescription" data-ui-placeholder="home_requirement_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="उदाहरण: सोनभद्र में 2 दिन के लिए ट्रैक्टर ट्रॉली चाहिए" />
-          <button onclick="searchSuppliers()" class="rounded-xl bg-brand-600 px-4 py-2.5 font-semibold text-white shadow-md transition hover:bg-brand-700">
-            <span data-ui-i18n="home_search_btn">सप्लायर खोजें</span>
-          </button>
+          <div class="grid gap-2 sm:grid-cols-2">
+            <input id="guestNameInput" data-ui-placeholder="home_guest_name_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="Guest नाम (optional)" />
+            <input id="guestPhoneInput" data-ui-placeholder="home_guest_phone_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="Guest मोबाइल (optional)" />
+          </div>
         </div>
         <p class="mt-3 text-xs text-slate-500">
           <span data-ui-i18n="home_booking_note_prefix">आप बिना लॉगिन भी बुकिंग कर सकते हैं (नाम + मोबाइल देकर)। लॉगिन करने पर</span>
@@ -43,55 +71,146 @@
   </div>
 </section>
 
-<section class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-  <article class="gh-feature-card animate-rise delay-1">
-    <p data-ui-i18n="home_feature_category_label" class="text-xs uppercase tracking-[0.14em] text-brand-700">श्रेणी</p>
-    <h3 class="mt-1 font-display text-lg font-bold text-slate-900">Construction Materials</h3>
-    <p data-ui-i18n="home_feature_materials_desc" class="mt-2 text-sm text-slate-600">सीमेंट, गिट्टी, बालू, स्टील और साइट का पूरा सामान।</p>
-  </article>
-  <article class="gh-feature-card animate-rise delay-2">
-    <p data-ui-i18n="home_feature_category_label" class="text-xs uppercase tracking-[0.14em] text-brand-700">श्रेणी</p>
-    <h3 class="mt-1 font-display text-lg font-bold text-slate-900">Heavy Vehicles</h3>
-    <p data-ui-i18n="home_feature_heavy_desc" class="mt-2 text-sm text-slate-600">JCB, Excavator, Loader जैसी भारी मशीनरी बुकिंग।</p>
-  </article>
-  <article class="gh-feature-card animate-rise delay-3">
-    <p data-ui-i18n="home_feature_category_label" class="text-xs uppercase tracking-[0.14em] text-brand-700">श्रेणी</p>
-    <h3 class="mt-1 font-display text-lg font-bold text-slate-900">Transport Vehicles</h3>
-    <p data-ui-i18n="home_feature_transport_desc" class="mt-2 text-sm text-slate-600">Truck, mini-truck और स्थानीय लॉजिस्टिक्स सपोर्ट।</p>
-  </article>
-  <article class="gh-feature-card animate-rise delay-4">
-    <p data-ui-i18n="home_feature_category_label" class="text-xs uppercase tracking-[0.14em] text-brand-700">श्रेणी</p>
-    <h3 class="mt-1 font-display text-lg font-bold text-slate-900">Equipment Rentals</h3>
-    <p data-ui-i18n="home_feature_rental_desc" class="mt-2 text-sm text-slate-600">छोटे और लंबे समय के लिए उपकरण किराये पर।</p>
-  </article>
+<section class="mt-8 rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-sm">
+  <div class="mb-4">
+    <h2 data-ui-i18n="home_three_col_title" class="font-display text-2xl font-bold text-slate-900">Top Categories</h2>
+    <p data-ui-i18n="home_three_col_desc" class="text-sm text-slate-600">Home page पर हर category के top 2-3 items दिखते हैं। नीचे subcategory से sort/filter कर सकते हैं।</p>
+  </div>
+
+  <div id="homeCategoryColumns" class="grid gap-4 lg:grid-cols-3">
+    <article class="rounded-2xl border border-blue-200 bg-blue-50/45 p-4">
+      <div class="mb-2">
+        <h3 data-ui-i18n="home_col_vehicle_title" class="font-display text-lg font-bold text-blue-900">Book Vehicle</h3>
+        <p data-ui-i18n="home_col_vehicle_desc" class="text-xs text-blue-800">Car, Truck, Auto, Tractor जैसे options.</p>
+      </div>
+      <label for="homeFilterBookVehicle" data-ui-i18n="home_col_sort_label" class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">Sort by subcategory</label>
+      <select id="homeFilterBookVehicle" class="gh-input mt-1 w-full rounded-xl px-3 py-2 text-sm" data-home-filter-column="book_vehicle"></select>
+      <div id="homeItemsBookVehicle" class="mt-3 grid gap-3"></div>
+    </article>
+
+    <article class="rounded-2xl border border-emerald-200 bg-emerald-50/45 p-4">
+      <div class="mb-2">
+        <h3 data-ui-i18n="home_col_material_title" class="font-display text-lg font-bold text-emerald-900">Buy Building Materials</h3>
+        <p data-ui-i18n="home_col_material_desc" class="text-xs text-emerald-800">Cement, Sand, Balu, Steel जैसे items.</p>
+      </div>
+      <label for="homeFilterMaterials" data-ui-i18n="home_col_sort_label" class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">Sort by subcategory</label>
+      <select id="homeFilterMaterials" class="gh-input mt-1 w-full rounded-xl px-3 py-2 text-sm" data-home-filter-column="buy_materials"></select>
+      <div id="homeItemsMaterials" class="mt-3 grid gap-3"></div>
+    </article>
+
+    <article class="rounded-2xl border border-amber-200 bg-amber-50/45 p-4">
+      <div class="mb-2">
+        <h3 data-ui-i18n="home_col_agri_title" class="font-display text-lg font-bold text-amber-900">Agriculture</h3>
+        <p data-ui-i18n="home_col_agri_desc" class="text-xs text-amber-800">Seeds, Fertilizer, Pesticide, Farm tools.</p>
+      </div>
+      <label for="homeFilterAgriculture" data-ui-i18n="home_col_sort_label" class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">Sort by subcategory</label>
+      <select id="homeFilterAgriculture" class="gh-input mt-1 w-full rounded-xl px-3 py-2 text-sm" data-home-filter-column="agriculture"></select>
+      <div id="homeItemsAgriculture" class="mt-3 grid gap-3"></div>
+    </article>
+  </div>
 </section>
 
-<section class="mt-8 rounded-2xl border border-slate-200 bg-white/85 p-6 shadow-sm">
+<section class="mt-8 rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-sm">
   <div class="mb-4 flex flex-wrap items-end justify-between gap-3">
     <div>
-      <h2 data-ui-i18n="home_available_title" class="font-display text-2xl font-bold text-slate-900">उपलब्ध सप्लायर</h2>
-      <p data-ui-i18n="home_available_desc" class="text-sm text-slate-600">सीधा फोन करने के लिए Call दबाएं या WhatsApp से बुकिंग शुरू करें।</p>
+      <h2 data-ui-i18n="home_results_title" class="font-display text-2xl font-bold text-slate-900">Searched Suppliers / Items</h2>
+      <p data-ui-i18n="home_results_desc" class="text-sm text-slate-600">Keyword या Voice search के बाद relevant suppliers यहां ऊपर दिखेंगे।</p>
     </div>
   </div>
   <div id="supplierCards" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3"></div>
+  <pre id="actionResult" data-ui-i18n="action_ready" class="gh-status-pre mt-4 hidden overflow-x-auto rounded-xl p-4 text-xs" aria-live="polite"></pre>
 </section>
 
-<section class="mt-8 rounded-2xl border border-slate-200 bg-slate-100/80 p-6 shadow-sm">
-  <h3 data-ui-i18n="home_console_title" class="font-display text-lg font-bold text-slate-900">लाइव एक्टिविटी कंसोल</h3>
-  <p data-ui-i18n="home_console_desc" class="mt-1 text-sm text-slate-600">खोज, कॉल और बुकिंग के दौरान API रिस्पॉन्स यहां दिखेगा।</p>
-  <pre id="actionResult" data-ui-i18n="action_ready" class="gh-status-pre mt-3 hidden overflow-x-auto rounded-xl p-4 text-xs" aria-live="polite"></pre>
+<section class="mt-8 gh-tab-shell" data-tab-group="home-main">
+  <div class="gh-tab-list">
+    <button type="button" data-tab-button="home-main" data-tab-target="home-panel-discover" data-tab-default data-ui-i18n="home_tab_discover" class="gh-tab-btn">खोज और बुकिंग</button>
+    <button type="button" data-tab-button="home-main" data-tab-target="home-panel-workflow" data-ui-i18n="home_tab_workflow" class="gh-tab-btn">वर्कफ्लो</button>
+    <button type="button" data-tab-button="home-main" data-tab-target="home-panel-support" data-ui-i18n="home_tab_support" class="gh-tab-btn">सपोर्ट</button>
+  </div>
+
+  <div id="home-panel-discover" data-tab-panel="home-main">
+    <section class="rounded-2xl border border-slate-200 bg-slate-100/80 p-6 shadow-sm">
+      <h3 data-ui-i18n="home_console_title" class="font-display text-lg font-bold text-slate-900">लाइव एक्टिविटी कंसोल</h3>
+      <p data-ui-i18n="home_console_desc" class="mt-1 text-sm text-slate-600">खोज, कॉल और बुकिंग के दौरान API रिस्पॉन्स ऊपर results card में दिखेगा।</p>
+    </section>
+  </div>
+
+  <div id="home-panel-workflow" data-tab-panel="home-main" class="hidden">
+    <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <article class="gh-feature-card animate-rise delay-1">
+        <p data-ui-i18n="home_feature_category_label" class="text-xs uppercase tracking-[0.14em] text-brand-700">श्रेणी</p>
+        <h3 class="mt-1 font-display text-lg font-bold text-slate-900">Buy Building Materials</h3>
+        <p data-ui-i18n="home_feature_materials_desc" class="mt-2 text-sm text-slate-600">सीमेंट, गिट्टी, बालू, स्टील और साइट का पूरा सामान।</p>
+      </article>
+      <article class="gh-feature-card animate-rise delay-2">
+        <p data-ui-i18n="home_feature_category_label" class="text-xs uppercase tracking-[0.14em] text-brand-700">श्रेणी</p>
+        <h3 class="mt-1 font-display text-lg font-bold text-slate-900">Book Vehicle</h3>
+        <p data-ui-i18n="home_feature_vehicle_desc" class="mt-2 text-sm text-slate-600">Truck, Car, Auto, Tractor जैसी वाहन बुकिंग।</p>
+      </article>
+      <article class="gh-feature-card animate-rise delay-3">
+        <p data-ui-i18n="home_feature_category_label" class="text-xs uppercase tracking-[0.14em] text-brand-700">श्रेणी</p>
+        <h3 class="mt-1 font-display text-lg font-bold text-slate-900">Agriculture</h3>
+        <p data-ui-i18n="home_feature_agri_desc" class="mt-2 text-sm text-slate-600">बीज, खाद, कीटनाशक और खेती से जुड़े सामान व सेवाएं।</p>
+      </article>
+    </section>
+
+    <section class="mt-6 rounded-2xl border border-slate-200 bg-white/85 p-6 shadow-sm">
+      <h2 data-ui-i18n="home_flow_title" class="font-display text-2xl font-bold text-slate-900">कैसे काम करता है</h2>
+      <p data-ui-i18n="home_flow_desc" class="text-sm text-slate-600">3 आसान स्टेप में खोज से बुकिंग तक पूरा workflow।</p>
+      <div class="mt-4 grid gap-4 md:grid-cols-3">
+        <article class="gh-step-card">
+          <p class="gh-step-index">01</p>
+          <h3 data-ui-i18n="home_flow_step_1_title" class="font-display text-lg font-bold text-slate-900">श्रेणी चुनें</h3>
+          <p data-ui-i18n="home_flow_step_1_desc" class="mt-1 text-sm text-slate-600">सामग्री, वाहन या उपकरण जैसी category चुनें।</p>
+        </article>
+        <article class="gh-step-card">
+          <p class="gh-step-index">02</p>
+          <h3 data-ui-i18n="home_flow_step_2_title" class="font-display text-lg font-bold text-slate-900">Verified सप्लायर देखें</h3>
+          <p data-ui-i18n="home_flow_step_2_desc" class="mt-1 text-sm text-slate-600">रेटिंग और संपर्क नंबर के साथ लिस्टिंग देखें।</p>
+        </article>
+        <article class="gh-step-card">
+          <p class="gh-step-index">03</p>
+          <h3 data-ui-i18n="home_flow_step_3_title" class="font-display text-lg font-bold text-slate-900">Call या WhatsApp से बुक करें</h3>
+          <p data-ui-i18n="home_flow_step_3_desc" class="mt-1 text-sm text-slate-600">रिक्वेस्ट भेजें और तुरंत सप्लायर से बात करें।</p>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <div id="home-panel-support" data-tab-panel="home-main" class="hidden">
+    <section class="rounded-2xl border border-brand-100 bg-brand-50/70 p-6 shadow-sm">
+      <h3 data-ui-i18n="home_support_title" class="font-display text-lg font-bold text-brand-900">ओनर/सपोर्ट संपर्क</h3>
+      <p data-ui-i18n="home_support_desc" class="mt-1 text-sm text-slate-700">कोई समस्या हो तो सीधे संपर्क करें:</p>
+      <p class="mt-2 text-sm text-slate-700">
+        <span data-ui-i18n="home_owner_email">ईमेल:</span>
+        <a href="mailto:cba.vaibhav23@gmail.com" class="font-semibold text-brand-700 hover:underline">cba.vaibhav23@gmail.com</a>
+      </p>
+      <p class="mt-1 text-sm text-slate-700">
+        <span data-ui-i18n="home_owner_whatsapp">WhatsApp:</span>
+        <a href="https://wa.me/916362272078" target="_blank" rel="noopener noreferrer" class="font-semibold text-brand-700 hover:underline">+91-6362272078</a>
+      </p>
+      <p data-ui-i18n="home_support_note" class="mt-3 rounded-xl border border-brand-200 bg-white/80 px-3 py-2 text-xs text-slate-700">
+        लोकल टेस्ट के लिए पहले demo data seed करें, फिर login IDs उपयोग करें।
+      </p>
+      <div class="mt-4 rounded-xl border border-slate-200 bg-white/80 p-3">
+        <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-600">SEO keyword cloud (sample)</p>
+        <div class="mt-2 flex max-h-44 flex-wrap gap-2 overflow-y-auto pr-1">
+          {% for seo_keyword in (seo_keywords_cloud | default([], true))[:96] %}
+          <span class="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-700">{{ seo_keyword }}</span>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  </div>
 </section>
 
-<section class="mt-8 rounded-2xl border border-brand-100 bg-brand-50/70 p-6 shadow-sm">
-  <h3 data-ui-i18n="home_owner_title" class="font-display text-lg font-bold text-brand-900">ओनर/सपोर्ट संपर्क</h3>
-  <p data-ui-i18n="home_owner_desc" class="mt-1 text-sm text-slate-700">कोई समस्या हो तो सीधे संपर्क करें:</p>
-  <p class="mt-2 text-sm text-slate-700">
-    <span data-ui-i18n="home_owner_email">ईमेल:</span>
-    <a href="mailto:owner@graminhub.in" class="font-semibold text-brand-700 hover:underline">owner@graminhub.in</a>
-  </p>
-  <p class="mt-1 text-sm text-slate-700">
-    <span data-ui-i18n="home_owner_whatsapp">WhatsApp:</span>
-    <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" class="font-semibold text-brand-700 hover:underline">+91 98765 43210</a>
-  </p>
+<section class="mt-8 rounded-2xl border border-amber-200 bg-amber-50/80 p-6 shadow-sm">
+  <div class="flex flex-wrap items-start justify-between gap-3">
+    <div>
+      <h3 data-ui-i18n="home_disclaimer_title" class="font-display text-lg font-bold text-amber-900">Important Disclaimer</h3>
+      <p data-ui-i18n="home_disclaimer_desc" class="mt-1 text-sm text-slate-700">User, Buyer और Supplier सभी के लिए safety और fraud-control disclaimers लागू हैं।</p>
+    </div>
+    <a href="/privacy" data-ui-i18n="home_disclaimer_btn" class="rounded-xl border border-amber-400 bg-white px-4 py-2 text-sm font-semibold text-amber-800 transition hover:bg-amber-100">View Full Disclaimer</a>
+  </div>
 </section>
 {% endblock %}

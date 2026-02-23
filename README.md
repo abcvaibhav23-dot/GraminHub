@@ -58,7 +58,7 @@ GraminHub/
 
 ## 5) Important Repo Hygiene
 
-- Target source file budget: `<= 75` files (excluding `.git` and local virtualenv)
+- Target tracked source file budget: `<= 75` files (`git ls-files` count)
 - Local generated/runtime files must not be committed (`backend/venv`, `.env`, logs, cache, backups)
 
 Useful commands:
@@ -88,8 +88,10 @@ Main variables:
 | `JWT_SECRET_KEY` | JWT signing key | long random string |
 | `JWT_ALGORITHM` | JWT algorithm | `HS256` |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | token expiry | `60` |
+| `OTP_EXPOSE_IN_RESPONSE` | expose demo OTP in API response (`1` dev, `0` prod) | `1` |
 | `CORS_ORIGINS` | allowed origins | `http://localhost:8000,https://graminhub.in,https://www.graminhub.in` |
 | `RATE_LIMIT_PER_MINUTE` | per-IP limit | `120` |
+| `ADMIN_PHONE_ALLOWLIST` | phones allowed for Admin OTP login | `9000000001,6362272078` |
 
 ## 7) Setup And Run
 
@@ -171,10 +173,10 @@ make db-seed-demo
 
 Demo credentials:
 
-- Admin: `admin.demo@example.com` / `demo123`
-- User: `user.demo@example.com` / `demo123`
-- Supplier 1: `supplier1.demo@example.com` / `demo123`
-- Supplier 2: `supplier2.demo@example.com` / `demo123`
+- Admin (Owner): phone `9000000001` (OTP login, allowlisted)
+- Buyer/User: phone `9000000002` (OTP login)
+- Supplier 1: phone `9000000003` (OTP login)
+- Supplier 2: phone `9000000004` (OTP login)
 - Guest: no login required
 
 Important behavior:
@@ -195,10 +197,29 @@ Role pages:
 - `/supplier-dashboard`
 - `/admin-dashboard`
 
+Tabbed page-inside-page structure:
+
+- Home (`/`): `Discover & Book`, `Workflow`, `Support` tabs
+- Supplier dashboard: `Setup`, `Manage Records`, `Bookings` tabs
+- Supplier manage tab includes nested tabs: `Supplier Profiles`, `Supplier Services`
+- Admin dashboard: `Supplier Ops`, `Configuration`, `Data & Moderation` tabs
+- Admin data tab includes nested tabs: `Pending Suppliers`, `All Bookings`, `Delete IDs`
+
+Search options on Home:
+
+- Global top search bar (Home page): keyword/sentence/voice search.
+- Quick-tag search is placed at the top (next to global search) for village-friendly fast discovery.
+- Old duplicate in-page search blocks were removed from Home content to keep one clear search flow.
+- Home page keeps disclaimer section at the end of the page with full details on `/privacy`.
+
 Profile editing:
 
 - Click navbar `Profile` after login
 - Opens in-page profile panel modal (not a separate workflow page)
+
+Language switch note:
+
+- Hindi/English switch now updates app text via `data-ui-lang` and avoids browser language popups caused by changing document `lang` dynamically.
 
 ## 11) API Surface (By Role)
 
@@ -312,6 +333,8 @@ CORS_ORIGINS=https://graminhub.in,https://www.graminhub.in
 - Root `pyproject.toml` is included with a valid `[project]` table so Vercel/uv install step does not fail.
 - Python runtime is resolved from `pyproject.toml` (`requires-python = ">=3.12"`).
 - `vercel.json` intentionally avoids legacy `builds` and explicit function runtime blocks.
+- SEO support includes `robots.txt`, `sitemap.xml`, Open Graph tags, and a generated keyword corpus (`backend/app/core/seo_keywords.py`).
+- Privacy note page is available at `/privacy` (also `/privacy-policy`).
 - If `DATABASE_URL` is not set, app falls back to sqlite on `/tmp/graminhub.db` (non-persistent, demo-only).
 
 Recommended Vercel environment variables:
@@ -321,6 +344,11 @@ Recommended Vercel environment variables:
 - `APP_ENV=production`
 - `DEBUG=0`
 - `CORS_ORIGINS=https://graminhub.in,https://www.graminhub.in`
+
+Support contact:
+
+- Email: `cba.vaibhav23@gmail.com`
+- Phone/WhatsApp: `+91-6362272078`
 
 ## 15) Troubleshooting
 
@@ -377,7 +405,7 @@ Primary DB tables:
 
 ### 17.2 Key Backend Modules
 
-- `app/api/auth.py`: login/register token issuance
+- `app/api/auth.py`: register + phone OTP token issuance
 - `app/api/users.py`: own-profile read/update
 - `app/api/suppliers.py`: search, profile/service create/edit, bookings/reviews
 - `app/api/admin.py`: approval, moderation, delete operations, categories
@@ -408,7 +436,8 @@ Primary DB tables:
 ### 18.1 Authentication Flow
 
 - Frontend: `app.js` login/register handlers
-- API: `POST /api/auth/register`, `POST /api/auth/login`
+- API: `POST /api/auth/register`, `POST /api/auth/otp/request`, `POST /api/auth/otp/verify`
+- Guardrails: public admin registration is blocked; admin OTP is allowed only for `ADMIN_PHONE_ALLOWLIST`
 - Security: JWT encode/decode (`core/security.py`)
 - Storage: `users` table
 
@@ -429,8 +458,8 @@ Primary DB tables:
 
 ### 18.4 Supplier Profile/Service Management Flow
 
-- Frontend: supplier dashboard create/edit forms
-- API: `/api/suppliers/profile`, `/api/suppliers/profiles/{id}`, `/api/suppliers/services/{id}`
+- Frontend: supplier dashboard create/edit forms with item name/details/variant + optional 3 photo URLs
+- API: `/api/suppliers/profile`, `/api/suppliers/profiles/{id}`, `/api/suppliers/services`, `/api/suppliers/services/{id}`
 - Service: `supplier_service.py`
 - Storage: `suppliers`, `supplier_services`
 

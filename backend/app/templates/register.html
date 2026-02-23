@@ -15,6 +15,10 @@
         <input id="regEmail" data-ui-placeholder="register_email_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="name@example.com" />
       </div>
       <div>
+        <label data-ui-i18n="register_phone_label" for="regPhone" class="mb-1 block text-sm font-semibold text-slate-700">मोबाइल नंबर</label>
+        <input id="regPhone" data-ui-placeholder="register_phone_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="10-digit mobile number" />
+      </div>
+      <div>
         <label data-ui-i18n="register_password_label" for="regPassword" class="mb-1 block text-sm font-semibold text-slate-700">पासवर्ड</label>
         <input id="regPassword" data-ui-placeholder="register_password_placeholder" type="password" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="नया पासवर्ड बनाएं" />
       </div>
@@ -23,7 +27,6 @@
         <select id="regRole" class="gh-input w-full rounded-xl px-3 py-2.5">
           <option data-ui-option="register_role_user" value="user">User (ग्राहक)</option>
           <option data-ui-option="register_role_supplier" value="supplier">Supplier (विक्रेता)</option>
-          <option data-ui-option="register_role_admin" value="admin">Admin (प्रशासन)</option>
         </select>
       </div>
       <button onclick="registerUser()" class="w-full rounded-xl bg-brand-600 px-4 py-2.5 font-semibold text-white shadow-md transition hover:bg-brand-700"><span data-ui-i18n="register_button">रजिस्टर करें</span></button>
@@ -45,8 +48,8 @@
         <p data-ui-i18n="register_panel_supplier_desc" class="mt-1 text-emerald-50">प्रोफाइल बनाएं, रेट सहित सेवाएं जोड़ें और बुकिंग संभालें।</p>
       </div>
       <div class="rounded-2xl bg-white/15 p-3">
-        <p data-ui-i18n="register_panel_admin_title" class="font-semibold text-white">Admin (प्रशासन)</p>
-        <p data-ui-i18n="register_panel_admin_desc" class="mt-1 text-emerald-50">सप्लायर अप्रूवल, नई कैटेगरी और पूरी गतिविधि मॉनिटर करें।</p>
+        <p data-ui-i18n="register_panel_note_title" class="font-semibold text-white">Note</p>
+        <p data-ui-i18n="register_panel_note_desc" class="mt-1 text-emerald-50">Public registration में Buyer/User और Supplier roles ही दिखाए जाते हैं।</p>
       </div>
     </div>
   </article>

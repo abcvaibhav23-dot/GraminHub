@@ -6,7 +6,7 @@ from typing import Optional
 from sqlalchemy import or_, text
 from sqlalchemy.orm import Session
 
-from app.core.exceptions import NotFoundError
+from app.core.exceptions import NotFoundError, ValidationError
 from app.models.category import Category
 from app.models.supplier import Supplier, SupplierService
 from app.models.user import User
@@ -14,6 +14,18 @@ from app.schemas.supplier_schema import SupplierCreate, SupplierServiceCreate, S
 
 
 logger = logging.getLogger(__name__)
+
+
+def _normalized_optional_text(value: str | None) -> str | None:
+    if value is None:
+        return None
+    normalized = " ".join(value.strip().split())
+    return normalized or None
+
+
+def _validate_item_identity(item_name: str | None) -> None:
+    if not item_name:
+        raise ValidationError("Item name is required")
 
 
 def sync_supplier_id_sequence(db: Session) -> None:
@@ -113,15 +125,27 @@ def add_supplier_service(db: Session, user: User, payload: SupplierServiceCreate
     if not supplier:
         raise NotFoundError("Supplier profile not found")
 
-    category = db.query(Category).filter(Category.id == payload.category_id).first()
-    if not category:
-        raise NotFoundError("Invalid category")
+    if payload.category_id is not None:
+        category = db.query(Category).filter(Category.id == payload.category_id).first()
+        if not category:
+            raise NotFoundError("Invalid category")
+
+    item_name = _normalized_optional_text(payload.item_name)
+    item_details = _normalized_optional_text(payload.item_details)
+    item_variant = _normalized_optional_text(payload.item_variant)
+    _validate_item_identity(item_name)
 
     service = SupplierService(
         supplier_id=supplier.id,
         category_id=payload.category_id,
+        item_name=item_name,
+        item_details=item_details,
+        item_variant=item_variant,
+        photo_url_1=_normalized_optional_text(payload.photo_url_1),
+        photo_url_2=_normalized_optional_text(payload.photo_url_2),
+        photo_url_3=_normalized_optional_text(payload.photo_url_3),
         price=payload.price,
-        availability=payload.availability,
+        availability=_normalized_optional_text(payload.availability) or "available",
     )
     db.add(service)
     db.commit()
@@ -172,11 +196,31 @@ def update_supplier_service(
             raise NotFoundError("Invalid category")
         service.category_id = payload.category_id
 
+    if payload.item_name is not None:
+        service.item_name = _normalized_optional_text(payload.item_name)
+
+    if payload.item_details is not None:
+        service.item_details = _normalized_optional_text(payload.item_details)
+
+    if payload.item_variant is not None:
+        service.item_variant = _normalized_optional_text(payload.item_variant)
+
+    if payload.photo_url_1 is not None:
+        service.photo_url_1 = _normalized_optional_text(payload.photo_url_1)
+
+    if payload.photo_url_2 is not None:
+        service.photo_url_2 = _normalized_optional_text(payload.photo_url_2)
+
+    if payload.photo_url_3 is not None:
+        service.photo_url_3 = _normalized_optional_text(payload.photo_url_3)
+
     if payload.price is not None:
         service.price = payload.price
 
     if payload.availability is not None:
-        service.availability = payload.availability
+        service.availability = _normalized_optional_text(payload.availability) or "available"
+
+    _validate_item_identity(service.item_name)
 
     db.commit()
     db.refresh(service)
@@ -184,28 +228,59 @@ def update_supplier_service(
     return service
 
 
+def delete_supplier_service(db: Session, user: User, service_id: int) -> None:
+    query = db.query(SupplierService).filter(SupplierService.id == service_id)
+    if user.role != "admin":
+        ids = supplier_ids_for_user(db, user.id)
+        if not ids:
+            raise NotFoundError("Supplier profile not found")
+        query = query.filter(SupplierService.supplier_id.in_(ids))
+
+    service = query.first()
+    if not service:
+        raise NotFoundError("Supplier service not found")
+
+    db.delete(service)
+    db.commit()
+    logger.info("Supplier service deleted user_id=%s service_id=%s", user.id, service_id)
+
+
 def search_suppliers(
     db: Session,
     category_id: Optional[int] = None,
     query_text: Optional[str] = None,
 ) -> list[Supplier]:
-    query = db.query(Supplier).filter(Supplier.approved.is_(True), Supplier.blocked.is_(False))
-    if query_text:
-        term = f"%{query_text.strip()}%"
+    normalized_query = " ".join((query_text or "").split())
+    query_tokens = [token for token in normalized_query.split(" ") if token][:6]
+
+    query = (
+        db.query(Supplier)
+        .join(SupplierService, Supplier.id == SupplierService.supplier_id)
+        .outerjoin(Category, SupplierService.category_id == Category.id)
+        .filter(
+            Supplier.approved.is_(True),
+            Supplier.blocked.is_(False),
+            SupplierService.item_name.isnot(None),
+            SupplierService.item_name != "",
+        )
+    )
+
+    if category_id is not None:
+        query = query.filter(SupplierService.category_id == category_id)
+
+    for token in query_tokens:
+        term = f"%{token}%"
         query = query.filter(
             or_(
                 Supplier.business_name.ilike(term),
                 Supplier.address.ilike(term),
                 Supplier.phone.ilike(term),
+                SupplierService.item_name.ilike(term),
+                SupplierService.item_details.ilike(term),
+                SupplierService.item_variant.ilike(term),
+                SupplierService.availability.ilike(term),
+                Category.name.ilike(term),
             )
         )
-    if category_id is None:
-        return query.order_by(Supplier.id.asc()).all()
 
-    return (
-        query.join(SupplierService, Supplier.id == SupplierService.supplier_id)
-        .filter(SupplierService.category_id == category_id)
-        .distinct()
-        .order_by(Supplier.id.asc())
-        .all()
-    )
+    return query.distinct().order_by(Supplier.id.asc()).all()

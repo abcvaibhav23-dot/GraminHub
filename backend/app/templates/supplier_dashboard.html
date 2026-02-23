@@ -6,80 +6,117 @@
   <p data-ui-i18n="supplier_dash_subtitle" class="mt-2 max-w-3xl text-sm text-emerald-50 sm:text-base">WhatsApp नंबर सहित प्रोफाइल पूरी करें, सेवाओं का रेट जोड़ें और आने वाली बुकिंग रिक्वेस्ट देखें।</p>
 </section>
 
-<section class="grid gap-6 lg:grid-cols-2">
-  <article class="gh-glass-card rounded-2xl p-6">
-    <h2 data-ui-i18n="supplier_profile_title" class="font-display mb-1 text-xl font-bold text-slate-900">Supplier प्रोफाइल</h2>
-    <p data-ui-i18n="supplier_profile_desc" class="mb-4 text-sm text-slate-600">Admin approval के बाद यह प्रोफाइल यूज़र्स को दिखेगी।</p>
-    <div class="space-y-3">
-      <input id="spBusiness" data-ui-placeholder="supplier_profile_business_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="व्यवसाय का नाम" />
-      <input id="spPhone" data-ui-placeholder="supplier_profile_phone_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="फोन नंबर (WhatsApp चालू)" />
-      <input id="spAddress" data-ui-placeholder="supplier_profile_address_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="व्यवसाय का पता" />
-      <button onclick="saveSupplierProfile()" class="rounded-xl bg-brand-600 px-4 py-2.5 font-semibold text-white transition hover:bg-brand-700"><span data-ui-i18n="supplier_profile_save_btn">प्रोफाइल सेव करें</span></button>
-    </div>
-  </article>
-
-  <article class="gh-glass-card rounded-2xl p-6">
-    <h2 data-ui-i18n="supplier_service_title" class="font-display mb-1 text-xl font-bold text-slate-900">सेवा और कीमत जोड़ें</h2>
-    <p data-ui-i18n="supplier_service_desc" class="mb-4 text-sm text-slate-600">Category-wise सेवाएं जोड़ें ताकि यूज़र आपकी लिस्टिंग देख सकें।</p>
-    <div class="space-y-3">
-      <input id="svcCategoryId" data-ui-placeholder="supplier_service_category_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" type="number" placeholder="Category ID (जैसे 2)" />
-      <input id="svcPrice" data-ui-placeholder="supplier_service_price_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" type="number" step="0.01" placeholder="कीमत" />
-      <input id="svcAvailability" data-ui-placeholder="supplier_service_availability_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="उपलब्धता (available/on request)" value="available" />
-      <button onclick="addSupplierService()" class="rounded-xl bg-brand-600 px-4 py-2.5 font-semibold text-white transition hover:bg-brand-700"><span data-ui-i18n="supplier_service_add_btn">सेवा जोड़ें</span></button>
-    </div>
-  </article>
-</section>
-
-<section class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-  <h2 data-ui-i18n="supplier_manage_title" class="font-display mb-1 text-xl font-bold text-slate-900">जुड़े हुए रिकॉर्ड एडिट करें</h2>
-  <p data-ui-i18n="supplier_manage_desc" class="mb-4 text-sm text-slate-600">अपने पुराने Supplier प्रोफाइल और जोड़ी गई सेवाएं ID से अपडेट करें।</p>
-
-  <div class="grid gap-6 lg:grid-cols-2">
-    <article class="rounded-2xl border border-slate-200 p-4">
-      <div class="mb-3 flex flex-wrap gap-2">
-        <button onclick="loadMySupplierProfiles()" class="rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-black"><span data-ui-i18n="supplier_manage_load_profiles_btn">मेरे प्रोफाइल लोड करें</span></button>
-      </div>
-      <div class="space-y-3">
-        <input id="editSupplierId" data-ui-placeholder="supplier_manage_supplier_id_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" type="number" placeholder="Supplier ID" />
-        <input id="editSpBusiness" data-ui-placeholder="supplier_profile_business_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="व्यवसाय का नाम" />
-        <input id="editSpPhone" data-ui-placeholder="supplier_profile_phone_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="फोन नंबर (WhatsApp चालू)" />
-        <input id="editSpAddress" data-ui-placeholder="supplier_profile_address_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="व्यवसाय का पता" />
-        <button onclick="updateSupplierProfileById()" class="rounded-xl bg-brand-700 px-3 py-2 text-sm font-semibold text-white transition hover:bg-brand-900"><span data-ui-i18n="supplier_manage_update_profile_btn">Supplier प्रोफाइल अपडेट करें</span></button>
-      </div>
-    </article>
-
-    <article class="rounded-2xl border border-slate-200 p-4">
-      <div class="mb-3 flex flex-wrap gap-2">
-        <button onclick="loadMySupplierServices()" class="rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-black"><span data-ui-i18n="supplier_manage_load_services_btn">मेरी सेवाएं लोड करें</span></button>
-      </div>
-      <div class="space-y-3">
-        <input id="editServiceId" data-ui-placeholder="supplier_manage_service_id_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" type="number" placeholder="Service ID" />
-        <input id="editSvcCategoryId" data-ui-placeholder="supplier_service_category_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" type="number" placeholder="Category ID (जैसे 2)" />
-        <input id="editSvcPrice" data-ui-placeholder="supplier_service_price_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" type="number" step="0.01" placeholder="कीमत" />
-        <input id="editSvcAvailability" data-ui-placeholder="supplier_service_availability_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="उपलब्धता (available/on request)" />
-        <button onclick="updateSupplierServiceById()" class="rounded-xl bg-blue-700 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-900"><span data-ui-i18n="supplier_manage_update_service_btn">सेवा अपडेट करें</span></button>
-      </div>
-    </article>
+<section class="gh-tab-shell" data-tab-group="supplier-main">
+  <div class="gh-tab-list">
+    <button type="button" data-tab-button="supplier-main" data-tab-target="supplier-panel-setup" data-tab-default data-ui-i18n="supplier_tab_setup" class="gh-tab-btn">Setup</button>
+    <button type="button" data-tab-button="supplier-main" data-tab-target="supplier-panel-manage" data-ui-i18n="supplier_tab_manage" class="gh-tab-btn">Manage Records</button>
+    <button type="button" data-tab-button="supplier-main" data-tab-target="supplier-panel-bookings" data-ui-i18n="supplier_tab_bookings" class="gh-tab-btn">Bookings</button>
   </div>
 
-  <pre id="supplierManageOutput" data-ui-i18n="result_waiting" class="gh-status-pre mt-4 hidden rounded-xl p-4 text-xs" aria-live="polite"></pre>
-</section>
+  <div id="supplier-panel-setup" data-tab-panel="supplier-main">
+    <section class="grid gap-6 lg:grid-cols-2">
+      <article class="gh-glass-card rounded-2xl p-6">
+        <h2 data-ui-i18n="supplier_profile_title" class="font-display mb-1 text-xl font-bold text-slate-900">Supplier प्रोफाइल</h2>
+        <p data-ui-i18n="supplier_profile_desc" class="mb-4 text-sm text-slate-600">Admin approval के बाद यह प्रोफाइल यूज़र्स को दिखेगी।</p>
+        <div class="space-y-3">
+          <input id="spBusiness" data-ui-placeholder="supplier_profile_business_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="व्यवसाय का नाम" />
+          <input id="spPhone" data-ui-placeholder="supplier_profile_phone_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="फोन नंबर (WhatsApp चालू)" />
+          <input id="spAddress" data-ui-placeholder="supplier_profile_address_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="व्यवसाय का पता" />
+          <button onclick="saveSupplierProfile()" class="rounded-xl bg-brand-600 px-4 py-2.5 font-semibold text-white transition hover:bg-brand-700"><span data-ui-i18n="supplier_profile_save_btn">प्रोफाइल सेव करें</span></button>
+        </div>
+      </article>
 
-<section class="mt-6 grid gap-6 lg:grid-cols-2">
-  <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-    <h3 data-ui-i18n="supplier_activity_title" class="font-display text-lg font-bold text-slate-900">Supplier गतिविधि</h3>
-    <p data-ui-i18n="supplier_activity_desc" class="mt-1 text-sm text-slate-600">प्रोफाइल/सेवा अपडेट का API रिस्पॉन्स यहां देखें।</p>
-    <pre id="supplierResult" data-ui-i18n="supplier_activity_waiting" class="gh-status-pre mt-3 hidden rounded-xl p-4 text-xs" aria-live="polite"></pre>
-  </article>
-  <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <div>
-        <h3 data-ui-i18n="supplier_incoming_title" class="font-display text-lg font-bold text-slate-900">आने वाली बुकिंग रिक्वेस्ट</h3>
-        <p data-ui-i18n="supplier_incoming_desc" class="text-sm text-slate-600">यूज़र्स की नई बुकिंग रिक्वेस्ट यहां देखें।</p>
-      </div>
-      <button onclick="loadSupplierBookings()" class="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-black"><span data-ui-i18n="supplier_refresh_btn">रिफ्रेश</span></button>
-    </div>
-    <pre id="supplierBookings" data-ui-i18n="result_waiting" class="gh-status-pre mt-3 hidden rounded-xl p-4 text-xs" aria-live="polite"></pre>
-  </article>
+      <article class="gh-glass-card rounded-2xl p-6">
+        <h2 data-ui-i18n="supplier_service_title" class="font-display mb-1 text-xl font-bold text-slate-900">सेवा और कीमत जोड़ें</h2>
+        <p data-ui-i18n="supplier_service_desc" class="mb-4 text-sm text-slate-600">Item name/details/variant और 2-3 फोटो जोड़ें ताकि यूज़र को साफ जानकारी मिले।</p>
+        <div class="space-y-3">
+          <input id="svcCategoryId" data-ui-placeholder="supplier_service_category_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" type="number" placeholder="Category ID (जैसे 2)" />
+          <input id="svcItemName" data-ui-placeholder="supplier_service_item_name_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="आइटम नाम (जैसे PPC Cement)" />
+          <input id="svcItemVariant" data-ui-placeholder="supplier_service_item_variant_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="वैरायटी / ग्रेड (जैसे 50kg bag)" />
+          <textarea id="svcItemDetails" data-ui-placeholder="supplier_service_item_details_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" rows="2" placeholder="आइटम विवरण (optional)"></textarea>
+          <input id="svcPrice" data-ui-placeholder="supplier_service_price_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" type="number" step="0.01" placeholder="कीमत" />
+          <input id="svcAvailability" data-ui-placeholder="supplier_service_availability_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="उपलब्धता (available/on request)" value="available" />
+          <input id="svcPhoto1" data-ui-placeholder="supplier_service_photo_1_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="Photo URL 1" />
+          <input id="svcPhoto2" data-ui-placeholder="supplier_service_photo_2_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="Photo URL 2 (optional)" />
+          <input id="svcPhoto3" data-ui-placeholder="supplier_service_photo_3_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="Photo URL 3 (optional)" />
+          <button onclick="addSupplierService()" class="rounded-xl bg-brand-600 px-4 py-2.5 font-semibold text-white transition hover:bg-brand-700"><span data-ui-i18n="supplier_service_add_btn">सेवा जोड़ें</span></button>
+        </div>
+      </article>
+    </section>
+
+    <pre id="supplierResult" data-ui-i18n="supplier_activity_waiting" class="gh-status-pre mt-4 hidden rounded-xl p-4 text-xs" aria-live="polite"></pre>
+  </div>
+
+  <div id="supplier-panel-manage" data-tab-panel="supplier-main" class="hidden">
+    <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <h2 data-ui-i18n="supplier_manage_title" class="font-display mb-1 text-xl font-bold text-slate-900">जुड़े हुए रिकॉर्ड एडिट करें</h2>
+      <p data-ui-i18n="supplier_manage_desc" class="mb-4 text-sm text-slate-600">अपने पुराने Supplier प्रोफाइल और जोड़ी गई सेवाएं ID से अपडेट करें।</p>
+
+      <section class="gh-tab-shell" data-tab-group="supplier-manage">
+        <div class="gh-tab-list">
+          <button type="button" data-tab-button="supplier-manage" data-tab-target="supplier-manage-profiles" data-tab-default data-ui-i18n="supplier_manage_tab_profiles" class="gh-tab-btn">Supplier Profiles</button>
+          <button type="button" data-tab-button="supplier-manage" data-tab-target="supplier-manage-services" data-ui-i18n="supplier_manage_tab_services" class="gh-tab-btn">Supplier Services</button>
+        </div>
+
+        <div id="supplier-manage-profiles" data-tab-panel="supplier-manage">
+          <article class="rounded-2xl border border-slate-200 p-4">
+            <div class="mb-3 flex flex-wrap gap-2">
+              <button onclick="loadMySupplierProfiles()" class="rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-black"><span data-ui-i18n="supplier_manage_load_profiles_btn">मेरे प्रोफाइल लोड करें</span></button>
+            </div>
+            <div class="space-y-3">
+              <input id="editSupplierId" data-ui-placeholder="supplier_manage_supplier_id_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" type="number" placeholder="Supplier ID" />
+              <input id="editSpBusiness" data-ui-placeholder="supplier_profile_business_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="व्यवसाय का नाम" />
+              <input id="editSpPhone" data-ui-placeholder="supplier_profile_phone_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="फोन नंबर (WhatsApp चालू)" />
+              <input id="editSpAddress" data-ui-placeholder="supplier_profile_address_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="व्यवसाय का पता" />
+              <button onclick="updateSupplierProfileById()" class="rounded-xl bg-brand-700 px-3 py-2 text-sm font-semibold text-white transition hover:bg-brand-900"><span data-ui-i18n="supplier_manage_update_profile_btn">Supplier प्रोफाइल अपडेट करें</span></button>
+            </div>
+          </article>
+        </div>
+
+        <div id="supplier-manage-services" data-tab-panel="supplier-manage" class="hidden">
+          <article class="rounded-2xl border border-slate-200 p-4">
+            <div class="mb-3 flex flex-wrap gap-2">
+              <button onclick="loadMySupplierServices()" class="rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-black"><span data-ui-i18n="supplier_manage_load_services_btn">मेरी सेवाएं लोड करें</span></button>
+            </div>
+            <div class="space-y-3">
+              <input id="editServiceId" data-ui-placeholder="supplier_manage_service_id_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" type="number" placeholder="Service ID" />
+              <input id="editSvcCategoryId" data-ui-placeholder="supplier_service_category_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" type="number" placeholder="Category ID (जैसे 2)" />
+              <input id="editSvcItemName" data-ui-placeholder="supplier_service_item_name_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="आइटम नाम" />
+              <input id="editSvcItemVariant" data-ui-placeholder="supplier_service_item_variant_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="वैरायटी / ग्रेड" />
+              <textarea id="editSvcItemDetails" data-ui-placeholder="supplier_service_item_details_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" rows="2" placeholder="आइटम विवरण"></textarea>
+              <input id="editSvcPrice" data-ui-placeholder="supplier_service_price_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" type="number" step="0.01" placeholder="कीमत" />
+              <input id="editSvcAvailability" data-ui-placeholder="supplier_service_availability_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="उपलब्धता (available/on request)" />
+              <input id="editSvcPhoto1" data-ui-placeholder="supplier_service_photo_1_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="Photo URL 1" />
+              <input id="editSvcPhoto2" data-ui-placeholder="supplier_service_photo_2_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="Photo URL 2" />
+              <input id="editSvcPhoto3" data-ui-placeholder="supplier_service_photo_3_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="Photo URL 3" />
+              <button onclick="updateSupplierServiceById()" class="rounded-xl bg-blue-700 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-900"><span data-ui-i18n="supplier_manage_update_service_btn">सेवा अपडेट करें</span></button>
+              <button onclick="deleteSupplierServiceById()" class="rounded-xl bg-rose-700 px-3 py-2 text-sm font-semibold text-white transition hover:bg-rose-900"><span data-ui-i18n="supplier_manage_delete_service_btn">सेवा हटाएं</span></button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <pre id="supplierManageOutput" data-ui-i18n="result_waiting" class="gh-status-pre mt-4 hidden rounded-xl p-4 text-xs" aria-live="polite"></pre>
+    </section>
+  </div>
+
+  <div id="supplier-panel-bookings" data-tab-panel="supplier-main" class="hidden">
+    <section class="grid gap-6 lg:grid-cols-2">
+      <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h3 data-ui-i18n="supplier_activity_title" class="font-display text-lg font-bold text-slate-900">Supplier गतिविधि</h3>
+        <p data-ui-i18n="supplier_activity_desc" class="mt-1 text-sm text-slate-600">प्रोफाइल/सेवा अपडेट का API रिस्पॉन्स Setup tab में दिखेगा।</p>
+      </article>
+      <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 data-ui-i18n="supplier_incoming_title" class="font-display text-lg font-bold text-slate-900">आने वाली बुकिंग रिक्वेस्ट</h3>
+            <p data-ui-i18n="supplier_incoming_desc" class="text-sm text-slate-600">यूज़र्स की नई बुकिंग रिक्वेस्ट यहां देखें।</p>
+          </div>
+          <button onclick="loadSupplierBookings()" class="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-black"><span data-ui-i18n="supplier_refresh_btn">रिफ्रेश</span></button>
+        </div>
+        <pre id="supplierBookings" data-ui-i18n="result_waiting" class="gh-status-pre mt-3 hidden rounded-xl p-4 text-xs" aria-live="polite"></pre>
+      </article>
+    </section>
+  </div>
 </section>
 {% endblock %}

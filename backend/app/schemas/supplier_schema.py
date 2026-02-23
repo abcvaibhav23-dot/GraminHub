@@ -10,6 +10,46 @@ class SupplierCreate(BaseModel):
     address: str = Field(min_length=5, max_length=300)
 
 
+class SupplierServiceCreate(BaseModel):
+    category_id: int | None = None
+    item_name: str = Field(min_length=2, max_length=160)
+    item_details: str | None = Field(default=None, max_length=500)
+    item_variant: str | None = Field(default=None, max_length=160)
+    photo_url_1: str | None = Field(default=None, max_length=500)
+    photo_url_2: str | None = Field(default=None, max_length=500)
+    photo_url_3: str | None = Field(default=None, max_length=500)
+    price: float | None = Field(default=None, gt=0)
+    availability: str = Field(default="available", max_length=120)
+
+
+class SupplierServiceUpdate(BaseModel):
+    category_id: int | None = None
+    item_name: str | None = Field(default=None, max_length=160)
+    item_details: str | None = Field(default=None, max_length=500)
+    item_variant: str | None = Field(default=None, max_length=160)
+    photo_url_1: str | None = Field(default=None, max_length=500)
+    photo_url_2: str | None = Field(default=None, max_length=500)
+    photo_url_3: str | None = Field(default=None, max_length=500)
+    price: float | None = Field(default=None, gt=0)
+    availability: str | None = Field(default=None, max_length=120)
+
+
+class SupplierServiceOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    supplier_id: int
+    category_id: int | None = None
+    item_name: str | None = None
+    item_details: str | None = None
+    item_variant: str | None = None
+    photo_url_1: str | None = None
+    photo_url_2: str | None = None
+    photo_url_3: str | None = None
+    price: float | None = None
+    availability: str
+
+
 class SupplierOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -22,28 +62,7 @@ class SupplierOut(BaseModel):
     featured: bool
     average_rating: float = 0.0
     total_reviews: int = 0
-
-
-class SupplierServiceCreate(BaseModel):
-    category_id: int
-    price: float = Field(gt=0)
-    availability: str = Field(default="available", max_length=120)
-
-
-class SupplierServiceUpdate(BaseModel):
-    category_id: int | None = None
-    price: float | None = Field(default=None, gt=0)
-    availability: str | None = Field(default=None, max_length=120)
-
-
-class SupplierServiceOut(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    supplier_id: int
-    category_id: int
-    price: float
-    availability: str
+    services: list[SupplierServiceOut] = Field(default_factory=list)
 
 
 class CategoryOut(BaseModel):

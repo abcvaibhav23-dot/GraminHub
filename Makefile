@@ -63,8 +63,8 @@ e2e:
 
 # Count files that should matter for review/merge size.
 count-files:
-	@count=$$(find . -path "./.git" -prune -o -path "./backend/venv" -prune -o -type f -print | wc -l | tr -d ' '); \
-	echo "File count (excluding .git and backend/venv): $$count"; \
+	@count=$$(git ls-files | wc -l | tr -d ' '); \
+	echo "Tracked file count: $$count"; \
 	if [ "$$count" -gt "$(MAX_FILES)" ]; then \
 		echo "File count exceeds MAX_FILES=$(MAX_FILES)"; \
 		exit 1; \

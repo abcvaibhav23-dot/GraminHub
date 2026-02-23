@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field, ConfigDict
 class UserCreate(BaseModel):
     name: str = Field(min_length=2, max_length=120)
     email: str
+    phone: str | None = Field(default=None, min_length=7, max_length=30)
     password: str = Field(min_length=6, max_length=128)
     role: str = Field(default="user")
 
@@ -18,19 +19,29 @@ class UserOut(BaseModel):
     id: int
     name: str
     email: str
+    phone: str | None = None
     role: str
+    blocked: bool = False
     created_at: datetime
 
 
 class UserUpdate(BaseModel):
     name: str | None = Field(default=None, min_length=2, max_length=120)
     email: str | None = None
+    phone: str | None = Field(default=None, min_length=7, max_length=30)
     password: str | None = Field(default=None, min_length=6, max_length=128)
 
 
-class LoginRequest(BaseModel):
-    email: str
-    password: str
+class PhoneOtpRequest(BaseModel):
+    phone: str = Field(min_length=7, max_length=20)
+    role: str = Field(default="user")
+    name: str | None = Field(default=None, min_length=2, max_length=120)
+
+
+class PhoneOtpVerify(BaseModel):
+    phone: str = Field(min_length=7, max_length=20)
+    otp: str = Field(min_length=2, max_length=6)
+    role: str = Field(default="user")
 
 
 class TokenResponse(BaseModel):

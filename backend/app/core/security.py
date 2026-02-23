@@ -17,7 +17,7 @@ from app.models.user import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 fallback_pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/otp/verify")
 
 
 class TokenData(BaseModel):
@@ -69,6 +69,8 @@ def get_current_user(
     user = db.query(User).filter(User.id == int(data.sub)).first()
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
+    if getattr(user, "blocked", False):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account is blocked by admin")
     return user
 
 
