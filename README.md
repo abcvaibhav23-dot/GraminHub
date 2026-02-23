@@ -310,7 +310,8 @@ CORS_ORIGINS=https://graminhub.in,https://www.graminhub.in
 - All routes are rewritten to FastAPI app, so `/`, `/login`, `/admin-dashboard`, APIs, and static assets resolve through the same backend function.
 - Root `requirements.txt` points to `backend/requirements.txt` for Vercel dependency install.
 - Root `pyproject.toml` is included with a valid `[project]` table so Vercel/uv install step does not fail.
-- `.python-version` pins Python to `3.11` for predictable deploy runtime.
+- Python runtime is resolved from `pyproject.toml` (`requires-python = ">=3.12"`).
+- `vercel.json` intentionally avoids legacy `builds` and explicit function runtime blocks.
 - If `DATABASE_URL` is not set, app falls back to sqlite on `/tmp/graminhub.db` (non-persistent, demo-only).
 
 Recommended Vercel environment variables:
