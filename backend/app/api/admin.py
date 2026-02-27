@@ -17,8 +17,10 @@ from app.models.user import User
 from app.schemas.booking_schema import BookingOut
 from app.schemas.supplier_schema import SupplierCreate
 from app.schemas.supplier_schema import SupplierOut
+from app.schemas.site_setting_schema import SiteSettingsOut, SiteSettingsUpdate
 from app.schemas.user_schema import MessageResponse, UserOut
 from app.services.supplier_service import create_supplier_profile, delete_supplier_service
+from app.services.site_setting_service import get_site_settings, seed_site_settings, update_site_settings
 from app.services.user_service import get_or_create_phone_role_user, normalize_phone
 
 
@@ -27,7 +29,20 @@ router = APIRouter(prefix="/api/admin", tags=["admin"])
 
 
 class CategoryCreate(BaseModel):
+    key: str | None = Field(default=None, max_length=80)
     name: str = Field(min_length=2, max_length=100)
+    is_enabled: bool = Field(default=False)
+
+
+def _category_key_from_name(name: str) -> str:
+    safe = []
+    for ch in name.strip().lower():
+        if ch.isalnum():
+            safe.append(ch)
+        elif ch in {" ", "-", "/"}:
+            safe.append("_")
+    out = "_".join("".join(safe).split("_"))
+    return out[:80] or "category"
 
 
 class ManagedUserCreate(BaseModel):
@@ -252,14 +267,51 @@ def create_category_endpoint(
     _: User = Depends(require_roles("admin")),
     db: Session = Depends(get_db),
 ) -> MessageResponse:
-    exists = db.query(Category).filter(Category.name == payload.name).first()
+    key = (payload.key or "").strip().lower() or _category_key_from_name(payload.name)
+    exists = db.query(Category).filter((Category.key == key) | (Category.name == payload.name)).first()
     if exists:
         raise ConflictError("Category already exists")
 
-    db.add(Category(name=payload.name))
+    db.add(Category(key=key, name=payload.name, is_enabled=payload.is_enabled))
     db.commit()
     logger.info("Category created name=%s", payload.name)
     return MessageResponse(message="Category created")
+
+
+@router.get("/site-settings", response_model=SiteSettingsOut)
+def get_admin_site_settings(
+    _: User = Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+) -> SiteSettingsOut:
+    seed_site_settings(db)
+    data = get_site_settings(db)
+    return SiteSettingsOut(
+        show_supplier_phone=data["show_supplier_phone"],
+        enable_supplier_call=data["enable_supplier_call"],
+        enable_supplier_whatsapp=data["enable_supplier_whatsapp"],
+    )
+
+
+@router.put("/site-settings", response_model=SiteSettingsOut)
+def update_admin_site_settings(
+    payload: SiteSettingsUpdate,
+    _: User = Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+) -> SiteSettingsOut:
+    seed_site_settings(db)
+    updates: dict[str, bool] = {}
+    if payload.show_supplier_phone is not None:
+        updates["show_supplier_phone"] = payload.show_supplier_phone
+    if payload.enable_supplier_call is not None:
+        updates["enable_supplier_call"] = payload.enable_supplier_call
+    if payload.enable_supplier_whatsapp is not None:
+        updates["enable_supplier_whatsapp"] = payload.enable_supplier_whatsapp
+    data = update_site_settings(db, updates)
+    return SiteSettingsOut(
+        show_supplier_phone=data["show_supplier_phone"],
+        enable_supplier_call=data["enable_supplier_call"],
+        enable_supplier_whatsapp=data["enable_supplier_whatsapp"],
+    )
 
 
 @router.get("/bookings", response_model=list[BookingOut])

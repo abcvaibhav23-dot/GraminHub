@@ -50,7 +50,7 @@ GraminHub/
     .env.example
   scripts/
     e2e.sh
-    seed_demo.sql
+    seed_demo.sql.example
   docker-compose.yml
   Makefile
   README.md
@@ -91,7 +91,10 @@ Main variables:
 | `OTP_EXPOSE_IN_RESPONSE` | expose demo OTP in API response (`1` dev, `0` prod) | `1` |
 | `CORS_ORIGINS` | allowed origins | `http://localhost:8000,https://graminhub.in,https://www.graminhub.in` |
 | `RATE_LIMIT_PER_MINUTE` | per-IP limit | `120` |
-| `ADMIN_PHONE_ALLOWLIST` | phones allowed for Admin OTP login | `9000000001,6362272078` |
+| `ADMIN_PHONE_ALLOWLIST` | phones allowed for Admin OTP login | `9000000001` |
+| `PUBLIC_SUPPORT_EMAIL` | public support email in UI | `support@example.com` |
+| `PUBLIC_SUPPORT_PHONE` | public support phone in UI | `+91-9000000000` |
+| `PUBLIC_SUPPORT_WHATSAPP` | public WhatsApp number in UI | `+91-9000000000` |
 
 ## 7) Setup And Run
 
@@ -347,8 +350,8 @@ Recommended Vercel environment variables:
 
 Support contact:
 
-- Email: `cba.vaibhav23@gmail.com`
-- Phone/WhatsApp: `+91-6362272078`
+- Email: `PUBLIC_SUPPORT_EMAIL`
+- Phone/WhatsApp: `PUBLIC_SUPPORT_PHONE`
 
 ## 15) Troubleshooting
 

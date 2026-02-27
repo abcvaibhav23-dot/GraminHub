@@ -15,13 +15,14 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import inspect, text
 
-from app.api import admin, auth, bookings, suppliers, users
+from app.api import admin, auth, bookings, public, suppliers, users
 from app.core.config import Base, engine, settings, SessionLocal
 from app.core.exceptions import ServiceError
 from app.core.logging_config import setup_logging
 from app.core.request_context import set_request_id
 from app.core.seo_keywords import SEO_KEYWORDS, SEO_META_KEYWORDS
 from app.services.supplier_service import seed_default_categories, sync_supplier_id_sequence
+from app.services.site_setting_service import seed_site_settings
 from app import models  # noqa: F401 - ensures model metadata is imported
 
 
@@ -94,6 +95,9 @@ app.mount("/static", StaticFiles(directory=APP_DIR / "static"), name="static")
 templates = Jinja2Templates(directory=APP_DIR / "templates")
 templates.env.globals["seo_keywords_cloud"] = SEO_KEYWORDS
 templates.env.globals["seo_keywords_meta"] = SEO_META_KEYWORDS
+templates.env.globals["public_support_email"] = settings.PUBLIC_SUPPORT_EMAIL
+templates.env.globals["public_support_phone"] = settings.PUBLIC_SUPPORT_PHONE
+templates.env.globals["public_support_whatsapp"] = settings.PUBLIC_SUPPORT_WHATSAPP
 
 
 @app.on_event("startup")
@@ -169,11 +173,73 @@ def on_startup() -> None:
             conn.execute(text("ALTER TABLE supplier_services ALTER COLUMN category_id DROP NOT NULL"))
             conn.execute(text("ALTER TABLE supplier_services ALTER COLUMN price DROP NOT NULL"))
 
+    category_columns = {col["name"] for col in inspector.get_columns("categories")}
+    if "key" not in category_columns:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE categories ADD COLUMN key VARCHAR(80)"))
+        logger.info("Schema updated: added categories.key column")
+    if "is_enabled" not in category_columns:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE categories ADD COLUMN is_enabled BOOLEAN NOT NULL DEFAULT TRUE"))
+        logger.info("Schema updated: added categories.is_enabled column")
+
+    if engine.dialect.name == "postgresql":
+        with engine.begin() as conn:
+            conn.execute(text("CREATE INDEX IF NOT EXISTS ix_categories_is_enabled ON categories (is_enabled)"))
+
     db = SessionLocal()
     try:
+        # Backfill category keys/enabled flags for existing installs before seeding.
+        rows = db.execute(
+            text("SELECT id, name, COALESCE(key, '') AS key, COALESCE(is_enabled, TRUE) AS is_enabled FROM categories")
+        ).mappings().all()
+        name_to_defaults = {
+            "Building Materials": ("building_material", True),
+            "Vehicle Booking": ("vehicle_booking", True),
+            "Agriculture Supplies": ("agriculture_supplies", False),
+            "Equipment Rental": ("equipment_rental", False),
+            "Local Services": ("local_services", False),
+            # Backward compatibility (older names)
+            "Construction Materials": ("building_material", True),
+            "Heavy Vehicles": ("vehicle_booking", True),
+            "Transport Vehicles": ("vehicle_booking", True),
+            "Equipment Rentals": ("equipment_rental", False),
+        }
+        def _key_from_name(name: str) -> str:
+            normalized = "".join(ch if ch.isalnum() else "_" for ch in (name or "").strip().lower())
+            collapsed = "_".join(part for part in normalized.split("_") if part)
+            return (collapsed[:80] or "category")
+
+        for row in rows:
+            defaults = name_to_defaults.get(row["name"])
+            if defaults:
+                key, enabled = defaults
+            else:
+                key, enabled = (_key_from_name(row["name"]), False)
+
+            if row["key"] != key or bool(row["is_enabled"]) != bool(enabled) or not row["key"]:
+                db.execute(
+                    text("UPDATE categories SET key = :key, is_enabled = :enabled WHERE id = :id"),
+                    {"key": key, "enabled": enabled, "id": row["id"]},
+                )
+
         seed_default_categories(db)
+        seed_site_settings(db)
         sync_supplier_id_sequence(db)
         db.commit()
+
+        # Enforce constraints post-backfill for PostgreSQL installs.
+        if db.bind is not None and db.bind.dialect.name == "postgresql":
+            missing_keys = db.execute(
+                text("SELECT COUNT(*) FROM categories WHERE key IS NULL OR key = ''")
+            ).scalar_one()
+            duplicates = db.execute(
+                text("SELECT COUNT(*) FROM (SELECT key FROM categories GROUP BY key HAVING COUNT(*) > 1) t")
+            ).scalar_one()
+            if int(missing_keys) == 0 and int(duplicates) == 0:
+                db.execute(text("ALTER TABLE categories ALTER COLUMN key SET NOT NULL"))
+                db.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS ux_categories_key ON categories (key)"))
+                db.commit()
     finally:
         db.close()
     logger.info("Application startup completed")
@@ -266,4 +332,5 @@ app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(suppliers.router)
 app.include_router(bookings.router)
+app.include_router(public.router)
 app.include_router(admin.router)

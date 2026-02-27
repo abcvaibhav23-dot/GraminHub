@@ -45,7 +45,11 @@ class Settings:
         "http://localhost:8000,https://graminhub.in,https://www.graminhub.in",
     )
     RATE_LIMIT_PER_MINUTE: int = int(os.getenv("RATE_LIMIT_PER_MINUTE", "120"))
-    ADMIN_PHONE_ALLOWLIST: str = os.getenv("ADMIN_PHONE_ALLOWLIST", "9000000001,6362272078")
+    ADMIN_PHONE_ALLOWLIST: str = os.getenv("ADMIN_PHONE_ALLOWLIST", "9000000001")
+
+    PUBLIC_SUPPORT_EMAIL: str = os.getenv("PUBLIC_SUPPORT_EMAIL", "support@example.com").strip()
+    PUBLIC_SUPPORT_PHONE: str = os.getenv("PUBLIC_SUPPORT_PHONE", "+91-9000000000").strip()
+    PUBLIC_SUPPORT_WHATSAPP: str = os.getenv("PUBLIC_SUPPORT_WHATSAPP", "+91-9000000000").strip()
 
 
 settings = Settings()

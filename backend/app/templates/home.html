@@ -49,18 +49,20 @@
         <span data-ui-i18n="home_verified_chip" class="rounded-full bg-amber-400/90 px-4 py-2 font-semibold text-slate-900">Verified local network</span>
       </div>
     </div>
-    <div class="relative animate-rise delay-1">
-      <div class="gh-glass-card rounded-2xl p-5 sm:p-6">
-        <h2 data-ui-i18n="home_search_title" class="font-display text-xl font-bold text-slate-900">तुरंत खोजें और बुक करें</h2>
-        <p data-ui-i18n="home_search_desc" class="mt-1 text-sm text-slate-600">ऊपर top search bar में keyword, sentence या voice input देकर तुरंत सप्लायर खोजें।</p>
-        <div class="mt-4 grid gap-3">
-          <label data-ui-i18n="home_requirement_label" class="text-sm font-semibold text-slate-700" for="bookingDescription">आपकी जरूरत</label>
-          <input id="bookingDescription" data-ui-placeholder="home_requirement_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="उदाहरण: सोनभद्र में 2 दिन के लिए ट्रैक्टर ट्रॉली चाहिए" />
-          <div class="grid gap-2 sm:grid-cols-2">
-            <input id="guestNameInput" data-ui-placeholder="home_guest_name_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="Guest नाम (optional)" />
-            <input id="guestPhoneInput" data-ui-placeholder="home_guest_phone_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="Guest मोबाइल (optional)" />
-          </div>
-        </div>
+	    <div class="relative animate-rise delay-1">
+	      <div class="gh-glass-card rounded-2xl p-5 sm:p-6">
+	        <h2 data-ui-i18n="home_search_title" class="font-display text-xl font-bold text-slate-900">तुरंत खोजें और बुक करें</h2>
+	        <p data-ui-i18n="home_search_desc" class="mt-1 text-sm text-slate-600">ऊपर top search bar में keyword, sentence या voice input देकर तुरंत सप्लायर खोजें।</p>
+	        <div class="mt-4 grid gap-3">
+	          <label data-ui-i18n="home_category_label" class="text-sm font-semibold text-slate-700" for="categorySelect">श्रेणी (Category)</label>
+	          <select id="categorySelect" class="gh-input w-full rounded-xl px-3 py-2.5"></select>
+	          <label data-ui-i18n="home_requirement_label" class="text-sm font-semibold text-slate-700" for="bookingDescription">आपकी जरूरत</label>
+	          <input id="bookingDescription" data-ui-placeholder="home_requirement_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="उदाहरण: सोनभद्र में 2 दिन के लिए ट्रैक्टर ट्रॉली चाहिए" />
+	          <div class="grid gap-2 sm:grid-cols-2">
+	            <input id="guestNameInput" data-ui-placeholder="home_guest_name_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="Guest नाम (optional)" />
+	            <input id="guestPhoneInput" data-ui-placeholder="home_guest_phone_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="Guest मोबाइल (optional)" />
+	          </div>
+	        </div>
         <p class="mt-3 text-xs text-slate-500">
           <span data-ui-i18n="home_booking_note_prefix">आप बिना लॉगिन भी बुकिंग कर सकते हैं (नाम + मोबाइल देकर)। लॉगिन करने पर</span>
           <code>User</code>
@@ -77,38 +79,36 @@
     <p data-ui-i18n="home_three_col_desc" class="text-sm text-slate-600">Home page पर हर category के top 2-3 items दिखते हैं। नीचे subcategory से sort/filter कर सकते हैं।</p>
   </div>
 
-  <div id="homeCategoryColumns" class="grid gap-4 lg:grid-cols-3">
-    <article class="rounded-2xl border border-blue-200 bg-blue-50/45 p-4">
-      <div class="mb-2">
-        <h3 data-ui-i18n="home_col_vehicle_title" class="font-display text-lg font-bold text-blue-900">Book Vehicle</h3>
-        <p data-ui-i18n="home_col_vehicle_desc" class="text-xs text-blue-800">Car, Truck, Auto, Tractor जैसे options.</p>
-      </div>
+	  <div id="homeCategoryColumns" class="grid gap-4 lg:grid-cols-2">
+	    <article class="rounded-2xl border border-blue-200 bg-blue-50/45 p-4">
+	      <div class="mb-2">
+	        <h3 data-ui-i18n="home_col_vehicle_title" class="font-display text-lg font-bold text-blue-900">Book Vehicle</h3>
+	        <p data-ui-i18n="home_col_vehicle_desc" class="text-xs text-blue-800">Car, Truck, Auto, Tractor जैसे options.</p>
+	      </div>
       <label for="homeFilterBookVehicle" data-ui-i18n="home_col_sort_label" class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">Sort by subcategory</label>
       <select id="homeFilterBookVehicle" class="gh-input mt-1 w-full rounded-xl px-3 py-2 text-sm" data-home-filter-column="book_vehicle"></select>
       <div id="homeItemsBookVehicle" class="mt-3 grid gap-3"></div>
-    </article>
+	    </article>
 
-    <article class="rounded-2xl border border-emerald-200 bg-emerald-50/45 p-4">
-      <div class="mb-2">
-        <h3 data-ui-i18n="home_col_material_title" class="font-display text-lg font-bold text-emerald-900">Buy Building Materials</h3>
-        <p data-ui-i18n="home_col_material_desc" class="text-xs text-emerald-800">Cement, Sand, Balu, Steel जैसे items.</p>
-      </div>
+	    <article class="rounded-2xl border border-emerald-200 bg-emerald-50/45 p-4">
+	      <div class="mb-2">
+	        <h3 data-ui-i18n="home_col_material_title" class="font-display text-lg font-bold text-emerald-900">Buy Building Materials</h3>
+	        <p data-ui-i18n="home_col_material_desc" class="text-xs text-emerald-800">Cement, Sand, Balu, Steel जैसे items.</p>
+	      </div>
       <label for="homeFilterMaterials" data-ui-i18n="home_col_sort_label" class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">Sort by subcategory</label>
       <select id="homeFilterMaterials" class="gh-input mt-1 w-full rounded-xl px-3 py-2 text-sm" data-home-filter-column="buy_materials"></select>
-      <div id="homeItemsMaterials" class="mt-3 grid gap-3"></div>
-    </article>
+	      <div id="homeItemsMaterials" class="mt-3 grid gap-3"></div>
+	    </article>
+	  </div>
+	</section>
 
-    <article class="rounded-2xl border border-amber-200 bg-amber-50/45 p-4">
-      <div class="mb-2">
-        <h3 data-ui-i18n="home_col_agri_title" class="font-display text-lg font-bold text-amber-900">Agriculture</h3>
-        <p data-ui-i18n="home_col_agri_desc" class="text-xs text-amber-800">Seeds, Fertilizer, Pesticide, Farm tools.</p>
-      </div>
-      <label for="homeFilterAgriculture" data-ui-i18n="home_col_sort_label" class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">Sort by subcategory</label>
-      <select id="homeFilterAgriculture" class="gh-input mt-1 w-full rounded-xl px-3 py-2 text-sm" data-home-filter-column="agriculture"></select>
-      <div id="homeItemsAgriculture" class="mt-3 grid gap-3"></div>
-    </article>
-  </div>
-</section>
+	<section class="mt-6 rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-sm">
+	  <div class="mb-4">
+	    <h2 class="font-display text-2xl font-bold text-slate-900">More Services Coming Soon</h2>
+	    <p class="text-sm text-slate-600">ये श्रेणियां जल्द सक्रिय होंगी। अभी के लिए “Coming Soon” के रूप में दिखाई जाती हैं।</p>
+	  </div>
+	  <div id="comingSoonCategories" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
+	</section>
 
 <section class="mt-8 rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-sm">
   <div class="mb-4 flex flex-wrap items-end justify-between gap-3">
@@ -183,11 +183,11 @@
       <p data-ui-i18n="home_support_desc" class="mt-1 text-sm text-slate-700">कोई समस्या हो तो सीधे संपर्क करें:</p>
       <p class="mt-2 text-sm text-slate-700">
         <span data-ui-i18n="home_owner_email">ईमेल:</span>
-        <a href="mailto:cba.vaibhav23@gmail.com" class="font-semibold text-brand-700 hover:underline">cba.vaibhav23@gmail.com</a>
+        <a href="mailto:{{ public_support_email }}" class="font-semibold text-brand-700 hover:underline">{{ public_support_email }}</a>
       </p>
       <p class="mt-1 text-sm text-slate-700">
         <span data-ui-i18n="home_owner_whatsapp">WhatsApp:</span>
-        <a href="https://wa.me/916362272078" target="_blank" rel="noopener noreferrer" class="font-semibold text-brand-700 hover:underline">+91-6362272078</a>
+        <a href="https://wa.me/{{ public_support_whatsapp | replace('+', '') | replace('-', '') | replace(' ', '') }}" target="_blank" rel="noopener noreferrer" class="font-semibold text-brand-700 hover:underline">{{ public_support_whatsapp }}</a>
       </p>
       <p data-ui-i18n="home_support_note" class="mt-3 rounded-xl border border-brand-200 bg-white/80 px-3 py-2 text-xs text-slate-700">
         लोकल टेस्ट के लिए पहले demo data seed करें, फिर login IDs उपयोग करें।

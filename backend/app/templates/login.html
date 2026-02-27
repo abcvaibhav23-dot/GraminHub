@@ -57,7 +57,7 @@
 
       <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
         <h3 data-login-i18n="otp_title" class="font-display text-lg font-bold text-slate-900">Phone OTP Login (User/Supplier/Admin)</h3>
-        <p data-login-i18n="otp_desc" class="mt-1 text-xs text-slate-600">Email की जरूरत नहीं। फोन नंबर डालें, 2-digit OTP लें और लॉगिन करें।</p>
+        <p data-login-i18n="otp_desc" class="mt-1 text-xs text-slate-600">Email की जरूरत नहीं। फोन नंबर डालें, OTP लें और लॉगिन करें।</p>
         <p data-login-i18n="otp_admin_note" class="mt-1 text-[11px] text-slate-500">Owner/Admin login सिर्फ allowlisted नंबरों पर सक्षम है।</p>
         <div class="mt-3 grid gap-3">
           <input id="otpPhone" data-login-placeholder="otp_phone_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="फोन नंबर" />
@@ -70,7 +70,7 @@
             <button onclick="requestPhoneOtp()" class="rounded-xl border border-brand-300 bg-white px-4 py-2.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50">
               <span data-login-i18n="otp_request_btn">Get OTP</span>
             </button>
-            <input id="otpCode" data-login-placeholder="otp_code_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="2-digit OTP" />
+            <input id="otpCode" data-login-placeholder="otp_code_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="Enter OTP" />
           </div>
           <button onclick="verifyPhoneOtpLogin()" class="rounded-xl bg-brand-600 px-4 py-2.5 font-semibold text-white transition hover:bg-brand-700">
             <span data-login-i18n="otp_verify_btn">Verify OTP & Login</span>

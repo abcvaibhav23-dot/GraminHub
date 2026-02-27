@@ -1,3 +1,3 @@
-from app.api import admin, auth, bookings, suppliers, users
+from app.api import admin, auth, bookings, public, suppliers, users
 
-__all__ = ["admin", "auth", "bookings", "suppliers", "users"]
+__all__ = ["admin", "auth", "bookings", "public", "suppliers", "users"]
