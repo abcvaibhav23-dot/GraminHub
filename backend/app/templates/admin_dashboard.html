@@ -35,11 +35,37 @@
   </div>
 
   <div id="admin-panel-config" data-tab-panel="admin-main" class="hidden">
-    <section class="gh-glass-card rounded-2xl p-6">
-      <h2 data-ui-i18n="admin_category_title" class="font-display mb-1 text-xl font-bold text-slate-900">नई Category जोड़ें</h2>
-      <p data-ui-i18n="admin_category_desc" class="mb-4 text-sm text-slate-600">मार्केटप्लेस विस्तार के लिए नई श्रेणी बनाएं।</p>
-      <input id="newCategoryName" data-ui-placeholder="admin_category_placeholder" class="gh-input mb-3 w-full rounded-xl px-3 py-2.5" placeholder="Category नाम" />
-      <button onclick="createCategory()" class="rounded-xl bg-blue-700 px-4 py-2.5 font-semibold text-white transition hover:bg-blue-900"><span data-ui-i18n="admin_category_btn">Category बनाएं</span></button>
+    <section class="grid gap-6 lg:grid-cols-2">
+      <article class="gh-glass-card rounded-2xl p-6">
+        <h2 data-ui-i18n="admin_category_title" class="font-display mb-1 text-xl font-bold text-slate-900">नई Category जोड़ें</h2>
+        <p data-ui-i18n="admin_category_desc" class="mb-4 text-sm text-slate-600">मार्केटप्लेस विस्तार के लिए नई श्रेणी बनाएं।</p>
+        <input id="newCategoryName" data-ui-placeholder="admin_category_placeholder" class="gh-input mb-3 w-full rounded-xl px-3 py-2.5" placeholder="Category नाम" />
+        <button onclick="createCategory()" class="rounded-xl bg-blue-700 px-4 py-2.5 font-semibold text-white transition hover:bg-blue-900"><span data-ui-i18n="admin_category_btn">Category बनाएं</span></button>
+      </article>
+
+      <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 class="font-display mb-1 text-xl font-bold text-slate-900">Contact Controls</h2>
+        <p class="mb-4 text-sm text-slate-600">Owner यहां से Call/WhatsApp buttons और phone visibility ऑन/ऑफ कर सकता है।</p>
+
+        <div class="space-y-3">
+          <label class="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5">
+            <span class="text-sm font-semibold text-slate-800">Show supplier phone</span>
+            <input id="settingShowPhone" type="checkbox" class="h-5 w-5" />
+          </label>
+          <label class="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5">
+            <span class="text-sm font-semibold text-slate-800">Enable call button</span>
+            <input id="settingEnableCall" type="checkbox" class="h-5 w-5" />
+          </label>
+          <label class="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5">
+            <span class="text-sm font-semibold text-slate-800">Enable WhatsApp button</span>
+            <input id="settingEnableWhatsapp" type="checkbox" class="h-5 w-5" />
+          </label>
+          <div class="flex flex-wrap gap-3">
+            <button onclick="loadSiteSettingsForAdmin()" class="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-black">Load Settings</button>
+            <button onclick="saveSiteSettingsForAdmin()" class="rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-900">Save Settings</button>
+          </div>
+        </div>
+      </article>
     </section>
   </div>
 

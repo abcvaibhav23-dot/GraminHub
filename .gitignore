@@ -31,6 +31,9 @@ backend/logs/*
 backups/*
 !backups/.gitkeep
 
+# Local-only demo seed (do not commit)
+scripts/seed_demo.sql
+
 # Build artifacts
 build/
 dist/

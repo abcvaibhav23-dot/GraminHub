@@ -69,7 +69,9 @@ class CategoryOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    key: str
     name: str
+    is_enabled: bool
 
 
 class CallResponse(BaseModel):

@@ -37,13 +37,13 @@
           extend: {
             colors: {
               brand: {
-                50: "#ecfdf5",
-                100: "#d1fae5",
-                200: "#a7f3d0",
-                500: "#10b981",
-                600: "#059669",
-                700: "#047857",
-                900: "#064e3b",
+                50: "#E8F5E9",
+                100: "#C8E6C9",
+                200: "#A5D6A7",
+                500: "#43A047",
+                600: "#2E7D32",
+                700: "#1B5E20",
+                900: "#0B3D0B",
               },
             },
           },
@@ -52,7 +52,14 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;500;600&family=Montserrat:wght@500;600;700&family=Poppins:wght@400;500;600&family=Mukta:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
     <link rel="stylesheet" href="/static/css/styles.css" />
     <script type="application/ld+json">
       {
@@ -65,8 +72,8 @@
         "contactPoint": {
           "@type": "ContactPoint",
           "contactType": "customer support",
-          "email": "cba.vaibhav23@gmail.com",
-          "telephone": "+91-6362272078"
+          "email": "{{ public_support_email }}",
+          "telephone": "{{ public_support_phone }}"
         }
       }
     </script>
@@ -76,11 +83,13 @@
       <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-2 text-xs sm:text-sm">
         <p data-ui-i18n="top_strip_message" class="font-medium text-white/95">भारत का गांव-केंद्रित सप्लायर और सेवा नेटवर्क</p>
         <div class="flex flex-wrap items-center gap-2">
-          <a href="mailto:cba.vaibhav23@gmail.com" data-ui-i18n="top_strip_email" class="rounded-full border border-white/40 bg-white/10 px-3 py-1 font-semibold text-white transition hover:bg-white/20">
-            सपोर्ट: cba.vaibhav23@gmail.com
+          <a href="mailto:{{ public_support_email }}" class="rounded-full border border-white/40 bg-white/10 px-3 py-1 font-semibold text-white transition hover:bg-white/20">
+            <span data-ui-i18n="top_strip_email">सपोर्ट:</span>
+            <span class="ml-1">{{ public_support_email }}</span>
           </a>
-          <a href="tel:+916362272078" data-ui-i18n="top_strip_phone" class="rounded-full border border-white/40 bg-white/10 px-3 py-1 font-semibold text-white transition hover:bg-white/20">
-            कॉल: +91-6362272078
+          <a href="tel:{{ public_support_phone }}" class="rounded-full border border-white/40 bg-white/10 px-3 py-1 font-semibold text-white transition hover:bg-white/20">
+            <span data-ui-i18n="top_strip_phone">कॉल:</span>
+            <span class="ml-1">{{ public_support_phone }}</span>
           </a>
         </div>
       </div>
@@ -121,6 +130,8 @@
         <p>&copy; {{ year if year else 2026 }} GraminHub</p>
       </div>
     </footer>
+
+    <div id="toastWrap" class="gh-toast-wrap" aria-live="polite" aria-atomic="true"></div>
 
     <section id="profilePanel" class="fixed inset-0 z-50 hidden bg-slate-900/40 p-4 backdrop-blur-sm">
       <div class="mx-auto mt-8 w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">

@@ -35,14 +35,24 @@ clean-generated: clean-all
 db-reset:
 	@echo "Resetting PostgreSQL data..."
 	@docker compose exec -T db psql -U marketplace -d marketplace -c "\
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS key VARCHAR(80);\
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS is_enabled BOOLEAN NOT NULL DEFAULT TRUE;\
 TRUNCATE TABLE call_logs, reviews, bookings, supplier_services, suppliers, users, categories RESTART IDENTITY CASCADE;\
-INSERT INTO categories (name) VALUES ('Construction Materials'), ('Heavy Vehicles'), ('Transport Vehicles'), ('Equipment Rentals');"
+CREATE UNIQUE INDEX IF NOT EXISTS ux_categories_key ON categories (key);\
+INSERT INTO categories (key, name, is_enabled) VALUES \
+  ('building_material', 'Building Materials', TRUE), \
+  ('vehicle_booking', 'Vehicle Booking', TRUE), \
+  ('agriculture_supplies', 'Agriculture Supplies', FALSE), \
+  ('equipment_rental', 'Equipment Rental', FALSE), \
+  ('local_services', 'Local Services', FALSE);"
 	@echo "DB reset completed."
 
 # Seed demo supplier/user/admin and sample business data.
 db-seed-demo:
 	@echo "Seeding demo data..."
-	@docker compose exec -T db psql -U marketplace -d marketplace < scripts/seed_demo.sql
+	@seed_file="scripts/seed_demo.sql"; \
+	if [ ! -f "$$seed_file" ]; then seed_file="scripts/seed_demo.sql.example"; fi; \
+	docker compose exec -T db psql -U marketplace -d marketplace < "$$seed_file"
 	@echo "Demo seed completed."
 
 # Reset data and immediately seed demo accounts/data (recommended for demos).

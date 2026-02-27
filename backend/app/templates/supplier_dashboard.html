@@ -30,7 +30,7 @@
         <h2 data-ui-i18n="supplier_service_title" class="font-display mb-1 text-xl font-bold text-slate-900">सेवा और कीमत जोड़ें</h2>
         <p data-ui-i18n="supplier_service_desc" class="mb-4 text-sm text-slate-600">Item name/details/variant और 2-3 फोटो जोड़ें ताकि यूज़र को साफ जानकारी मिले।</p>
         <div class="space-y-3">
-          <input id="svcCategoryId" data-ui-placeholder="supplier_service_category_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" type="number" placeholder="Category ID (जैसे 2)" />
+          <select id="svcCategoryId" class="gh-input w-full rounded-xl px-3 py-2.5"></select>
           <input id="svcItemName" data-ui-placeholder="supplier_service_item_name_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="आइटम नाम (जैसे PPC Cement)" />
           <input id="svcItemVariant" data-ui-placeholder="supplier_service_item_variant_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="वैरायटी / ग्रेड (जैसे 50kg bag)" />
           <textarea id="svcItemDetails" data-ui-placeholder="supplier_service_item_details_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" rows="2" placeholder="आइटम विवरण (optional)"></textarea>
@@ -80,7 +80,7 @@
             </div>
             <div class="space-y-3">
               <input id="editServiceId" data-ui-placeholder="supplier_manage_service_id_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" type="number" placeholder="Service ID" />
-              <input id="editSvcCategoryId" data-ui-placeholder="supplier_service_category_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" type="number" placeholder="Category ID (जैसे 2)" />
+              <select id="editSvcCategoryId" class="gh-input w-full rounded-xl px-3 py-2.5"></select>
               <input id="editSvcItemName" data-ui-placeholder="supplier_service_item_name_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="आइटम नाम" />
               <input id="editSvcItemVariant" data-ui-placeholder="supplier_service_item_variant_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="वैरायटी / ग्रेड" />
               <textarea id="editSvcItemDetails" data-ui-placeholder="supplier_service_item_details_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" rows="2" placeholder="आइटम विवरण"></textarea>

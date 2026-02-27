@@ -25,10 +25,15 @@ def create_user(db: Session, payload: UserCreate) -> User:
         raise ForbiddenError("Admin registration is restricted")
 
     role = payload.role if payload.role in {"user", "supplier"} else "user"
+    normalized_phone = normalize_phone(payload.phone) if payload.phone else None
+    if normalized_phone:
+        phone_exists = db.query(User).filter(User.phone == normalized_phone).first()
+        if phone_exists:
+            raise ConflictError("Phone already exists")
     user = User(
         name=payload.name,
         email=payload.email.lower(),
-        phone=normalize_phone(payload.phone) if payload.phone else None,
+        phone=normalized_phone,
         password_hash=hash_password(payload.password),
         role=role,
         blocked=False,
@@ -52,7 +57,15 @@ def update_user_profile(db: Session, current_user: User, payload: UserUpdate) ->
         current_user.email = email
 
     if payload.phone is not None:
-        current_user.phone = normalize_phone(payload.phone)
+        normalized_phone = normalize_phone(payload.phone)
+        existing_phone = (
+            db.query(User)
+            .filter(User.phone == normalized_phone, User.id != current_user.id)
+            .first()
+        )
+        if existing_phone:
+            raise ConflictError("Phone already exists")
+        current_user.phone = normalized_phone
 
     if payload.password is not None:
         current_user.password_hash = hash_password(payload.password)
@@ -83,6 +96,8 @@ def get_or_create_guest_user(db: Session) -> User:
 
 def normalize_phone(phone: str) -> str:
     digits = "".join(ch for ch in str(phone) if ch.isdigit())
+    if len(digits) == 11 and digits.startswith("0"):
+        digits = digits[1:]
     if len(digits) == 10:
         return f"91{digits}"
     return digits
@@ -105,6 +120,17 @@ def get_or_create_phone_role_user(
     normalized_role = (role or "").strip().lower()
     safe_role = normalized_role if normalized_role in OTP_LOGIN_ROLES else "user"
     normalized_phone = normalize_phone(phone)
+
+    other = (
+        db.query(User)
+        .filter(User.phone == normalized_phone, User.role != safe_role)
+        .order_by(User.id.asc())
+        .first()
+    )
+    if other:
+        raise ConflictError(
+            f"Phone is already registered as {other.role}. Please log in with the same role."
+        )
 
     # Prefer exact phone+role match to avoid creating duplicate identities.
     user = (

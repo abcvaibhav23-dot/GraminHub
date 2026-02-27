@@ -1,4 +1,5 @@
 from conftest import otp_login, register_and_login
+from app.core.config import settings
 
 
 def test_user_registration_and_login(client):
@@ -107,15 +108,15 @@ def test_user_can_edit_own_profile(client):
 def test_phone_otp_login_for_user_and_supplier(client):
     otp_user = client.post(
         "/api/auth/otp/request",
-        json={"phone": "6362272078", "role": "user", "name": "OTP User"},
+        json={"phone": "9000000101", "role": "user", "name": "OTP User"},
     )
     assert otp_user.status_code == 200
     user_otp_code = otp_user.json()["otp"]
-    assert len(user_otp_code) == 2
+    assert len(user_otp_code) == settings.OTP_CODE_LENGTH
 
     verify_user = client.post(
         "/api/auth/otp/verify",
-        json={"phone": "6362272078", "role": "user", "otp": user_otp_code},
+        json={"phone": "9000000101", "role": "user", "otp": user_otp_code},
     )
     assert verify_user.status_code == 200
     user_token = verify_user.json()["access_token"]
@@ -126,15 +127,15 @@ def test_phone_otp_login_for_user_and_supplier(client):
 
     otp_supplier = client.post(
         "/api/auth/otp/request",
-        json={"phone": "6362272078", "role": "supplier", "name": "OTP Supplier"},
+        json={"phone": "9000000102", "role": "supplier", "name": "OTP Supplier"},
     )
     assert otp_supplier.status_code == 200
     supplier_otp_code = otp_supplier.json()["otp"]
-    assert len(supplier_otp_code) == 2
+    assert len(supplier_otp_code) == settings.OTP_CODE_LENGTH
 
     verify_supplier = client.post(
         "/api/auth/otp/verify",
-        json={"phone": "6362272078", "role": "supplier", "otp": supplier_otp_code},
+        json={"phone": "9000000102", "role": "supplier", "otp": supplier_otp_code},
     )
     assert verify_supplier.status_code == 200
     supplier_token = verify_supplier.json()["access_token"]

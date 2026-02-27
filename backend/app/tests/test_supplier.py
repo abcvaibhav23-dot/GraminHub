@@ -63,7 +63,7 @@ def test_supplier_block_hides_from_search_and_blocks_calls(client):
     supplier_id = profile.json()["id"]
     service = client.post(
         "/api/suppliers/services",
-        json={"category_id": 4, "item_name": "Concrete Mixer", "price": 7000, "availability": "available"},
+        json={"category_id": 1, "item_name": "Concrete Mixer", "price": 7000, "availability": "available"},
         headers={"Authorization": f"Bearer {supplier_token}"},
     )
     assert service.status_code == 200

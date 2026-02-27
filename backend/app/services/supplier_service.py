@@ -41,16 +41,45 @@ def sync_supplier_id_sequence(db: Session) -> None:
 
 def seed_default_categories(db: Session) -> None:
     defaults = [
-        "Construction Materials",
-        "Heavy Vehicles",
-        "Transport Vehicles",
-        "Equipment Rentals",
+        {"key": "building_material", "name": "Building Materials", "is_enabled": True},
+        {"key": "vehicle_booking", "name": "Vehicle Booking", "is_enabled": True},
+        {"key": "agriculture_supplies", "name": "Agriculture Supplies", "is_enabled": False},
+        {"key": "equipment_rental", "name": "Equipment Rental", "is_enabled": False},
+        {"key": "local_services", "name": "Local Services", "is_enabled": False},
     ]
-    for name in defaults:
-        exists = db.query(Category).filter(Category.name == name).first()
-        if not exists:
-            db.add(Category(name=name))
-            logger.info("Default category seeded name=%s", name)
+    for row in defaults:
+        exists = (
+            db.query(Category)
+            .filter((Category.key == row["key"]) | (Category.name == row["name"]))
+            .first()
+        )
+        if exists:
+            changed = False
+            if getattr(exists, "key", None) != row["key"]:
+                exists.key = row["key"]
+                changed = True
+            if exists.name != row["name"]:
+                exists.name = row["name"]
+                changed = True
+            if getattr(exists, "is_enabled", True) != row["is_enabled"]:
+                exists.is_enabled = row["is_enabled"]
+                changed = True
+            if changed:
+                logger.info(
+                    "Default category updated id=%s key=%s enabled=%s",
+                    exists.id,
+                    exists.key,
+                    exists.is_enabled,
+                )
+            continue
+
+        db.add(Category(key=row["key"], name=row["name"], is_enabled=row["is_enabled"]))
+        logger.info(
+            "Default category seeded key=%s name=%s enabled=%s",
+            row["key"],
+            row["name"],
+            row["is_enabled"],
+        )
     db.commit()
 
 
@@ -129,6 +158,8 @@ def add_supplier_service(db: Session, user: User, payload: SupplierServiceCreate
         category = db.query(Category).filter(Category.id == payload.category_id).first()
         if not category:
             raise NotFoundError("Invalid category")
+        if getattr(category, "is_enabled", True) is False and user.role != "admin":
+            raise ValidationError("Category is coming soon")
 
     item_name = _normalized_optional_text(payload.item_name)
     item_details = _normalized_optional_text(payload.item_details)

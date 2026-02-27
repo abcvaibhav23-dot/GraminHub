@@ -2,20 +2,34 @@ let supplierCache = {};
 let currentUserRole = "guest";
 let isProfilePanelOpen = false;
 let categoryNameById = {};
+let categoryList = [];
 let homeCategoryItems = [];
 let lastRenderedSearchSuppliers = [];
 let activeSupplierProfileId = null;
+let siteSettings = {
+  show_supplier_phone: true,
+  enable_supplier_call: true,
+  enable_supplier_whatsapp: true,
+};
 
 const UI_LANG_STORAGE_KEY = "ui_lang_mode";
+
+const CATEGORY_UI_CONFIG = {
+  building_material: { icon: "fa-solid fa-trowel-bricks" },
+  vehicle_booking: { icon: "fa-solid fa-truck-fast" },
+  agriculture_supplies: { icon: "fa-solid fa-seedling" },
+  equipment_rental: { icon: "fa-solid fa-screwdriver-wrench" },
+  local_services: { icon: "fa-solid fa-handshake-angle" },
+};
 
 const uiText = {
   hinglish: {
     nav_home: "होम",
     nav_login: "लॉगिन",
-    nav_register: "रजिस्टर",
+    nav_register: "रजिस्टर करें",
     nav_profile: "प्रोफाइल",
     nav_logout: "लॉगआउट",
-    nav_role_prefix: "भूमिका:",
+    nav_role_prefix: "भूमिका: ",
     nav_dashboard_admin: "Admin डैशबोर्ड",
     nav_dashboard_supplier: "Supplier डैशबोर्ड",
     global_search_placeholder: "Keyword, sentence, या material नाम लिखें",
@@ -32,8 +46,8 @@ const uiText = {
     footer_privacy_note: "प्राइवेसी नोट",
     brand_network_tagline: "गांव-कस्बा सप्लायर नेटवर्क",
     top_strip_message: "भारत का गांव-केंद्रित सप्लायर और सेवा नेटवर्क",
-    top_strip_email: "सपोर्ट: cba.vaibhav23@gmail.com",
-    top_strip_phone: "कॉल: +91-6362272078",
+    top_strip_email: "सपोर्ट:",
+    top_strip_phone: "कॉल:",
 
     role_guest: "मेहमान",
     role_user: "यूज़र",
@@ -67,7 +81,7 @@ const uiText = {
     home_search_title: "तुरंत खोजें और बुक करें",
     home_search_desc:
       "Category चुनें, अपनी जरूरत लिखें, सप्लायर खोजें और WhatsApp से बुकिंग शुरू करें।",
-    home_category_label: "श्रेणी (Category)",
+    home_category_label: "श्रेणी चुनें",
     home_query_label: "सप्लायर खोजें (नाम/स्थान/मोबाइल)",
     home_query_placeholder: "उदाहरण: Sonbhadra, JCB, 98765...",
     home_keyword_label: "Simple keyword search",
@@ -81,7 +95,7 @@ const uiText = {
     home_voice_no_result: "Voice से कोई शब्द नहीं मिला। फिर से प्रयास करें।",
     home_guest_name_placeholder: "Guest नाम (optional)",
     home_guest_phone_placeholder: "Guest मोबाइल (optional)",
-    home_requirement_label: "आपकी जरूरत",
+    home_requirement_label: "आपको क्या चाहिए",
     home_requirement_placeholder: "उदाहरण: सोनभद्र में 2 दिन के लिए ट्रैक्टर ट्रॉली चाहिए",
     home_search_btn: "सप्लायर खोजें",
     home_search_result_count: "खोज परिणाम: {count} सप्लायर मिले।",
@@ -202,14 +216,14 @@ const uiText = {
     form_title: "लॉगिन",
     form_desc: "Buyer, Supplier और Owner/Admin के लिए सिर्फ मोबाइल नंबर और OTP लॉगिन उपयोग करें।",
     otp_title: "Phone OTP Login (User/Supplier/Admin)",
-    otp_desc: "Email की जरूरत नहीं। फोन नंबर डालें, 2-digit OTP लें और लॉगिन करें।",
+    otp_desc: "Email की जरूरत नहीं। फोन नंबर डालें, OTP लें और लॉगिन करें।",
     otp_admin_note: "Owner/Admin लॉगिन सिर्फ allowlisted नंबरों पर सक्षम है।",
     otp_phone_placeholder: "फोन नंबर",
     otp_role_user: "Buyer/User",
     otp_role_supplier: "Supplier",
     otp_role_admin: "Owner/Admin",
     otp_request_btn: "Get OTP",
-    otp_code_placeholder: "2-digit OTP",
+    otp_code_placeholder: "Enter OTP",
     otp_verify_btn: "Verify OTP & Login",
     otp_hint: "Demo OTP स्क्रीन पर दिखेगा।",
     otp_phone_required: "कृपया सही फोन नंबर दर्ज करें।",
@@ -225,10 +239,10 @@ const uiText = {
     login_demo_password_hint: "OTP request response में demo OTP दिखता है।",
     result_waiting: "प्रतीक्षा...",
     no_account: "अकाउंट नहीं है?",
-    register_now: "अभी रजिस्टर करें",
+    register_now: "रजिस्टर करें",
 
-    register_title: "नया अकाउंट बनाएं",
-    register_desc: "एक बार रजिस्टर करें और सप्लायर खोज व बुकिंग शुरू करें।",
+    register_title: "रजिस्टर करें",
+    register_desc: "रजिस्टर करके सप्लायर खोजें और बुकिंग करें।",
     register_name_label: "पूरा नाम",
     register_name_placeholder: "अपना पूरा नाम लिखें",
     register_email_label: "ईमेल",
@@ -350,7 +364,7 @@ const uiText = {
     nav_register: "Register",
     nav_profile: "Profile",
     nav_logout: "Logout",
-    nav_role_prefix: "Role:",
+    nav_role_prefix: "Role: ",
     nav_dashboard_admin: "Admin Dashboard",
     nav_dashboard_supplier: "Supplier Dashboard",
     global_search_placeholder: "Type keyword, sentence, or material name",
@@ -368,8 +382,8 @@ const uiText = {
     footer_privacy_note: "Privacy Note",
     brand_network_tagline: "Village-Town Supplier Network",
     top_strip_message: "India's village-first supplier and services network",
-    top_strip_email: "Support: cba.vaibhav23@gmail.com",
-    top_strip_phone: "Call: +91-6362272078",
+    top_strip_email: "Support:",
+    top_strip_phone: "Call:",
 
     role_guest: "Guest",
     role_user: "User",
@@ -394,9 +408,9 @@ const uiText = {
     error_item_name_or_details_required: "Item name is required.",
 
     home_badge: "Verified Rural Marketplace",
-    home_title: "Book suppliers, vehicles, and rentals quickly from your village",
+    home_title: "Find trusted local suppliers and book vehicles nearby",
     home_desc:
-      "GraminHub brings Book Vehicle, Building Materials, and Agriculture services together in one place.",
+      "GraminHub helps you discover building materials and vehicle services from verified local suppliers. More categories are coming soon.",
     home_logged_in_as: "Logged in user:",
     home_booking_mode: "Booking: Call + WhatsApp",
     home_verified_chip: "Verified local network",
@@ -538,14 +552,14 @@ const uiText = {
     form_title: "Login",
     form_desc: "Use phone number + OTP for Buyer, Supplier, and Owner/Admin login.",
     otp_title: "Phone OTP Login (User/Supplier/Admin)",
-    otp_desc: "No email needed. Enter phone, get a 2-digit OTP, and log in.",
+    otp_desc: "No email needed. Enter phone, get an OTP, and log in.",
     otp_admin_note: "Owner/Admin login works only for allowlisted phone numbers.",
     otp_phone_placeholder: "Phone number",
     otp_role_user: "Buyer/User",
     otp_role_supplier: "Supplier",
     otp_role_admin: "Owner/Admin",
     otp_request_btn: "Get OTP",
-    otp_code_placeholder: "2-digit OTP",
+    otp_code_placeholder: "Enter OTP",
     otp_verify_btn: "Verify OTP & Login",
     otp_hint: "Demo OTP appears on screen.",
     otp_phone_required: "Please enter a valid phone number.",
@@ -706,17 +720,6 @@ const HOME_CATEGORY_COLUMNS = {
       { value: "brick", labelKey: "home_filter_brick", keywords: ["brick", "bricks", "tile", "tiles"] },
     ],
   },
-  agriculture: {
-    containerId: "homeItemsAgriculture",
-    filterId: "homeFilterAgriculture",
-    filterOptions: [
-      { value: "all", labelKey: "home_filter_all", keywords: [] },
-      { value: "seed", labelKey: "home_filter_seed", keywords: ["seed", "seeds"] },
-      { value: "fertilizer", labelKey: "home_filter_fertilizer", keywords: ["fertilizer", "urea", "dap", "npk"] },
-      { value: "pesticide", labelKey: "home_filter_pesticide", keywords: ["pesticide", "insecticide", "herbicide"] },
-      { value: "tool", labelKey: "home_filter_tool", keywords: ["farm", "agri", "agriculture", "sprayer", "harvester", "thresher"] },
-    ],
-  },
 };
 
 const HOME_BUCKET_KEYWORDS = {
@@ -745,17 +748,6 @@ const HOME_BUCKET_KEYWORDS = {
     "brick",
     "aggregate",
     "gitti",
-  ],
-  agriculture: [
-    "agriculture",
-    "agri",
-    "farm",
-    "farming",
-    "seed",
-    "fertilizer",
-    "pesticide",
-    "crop",
-    "harvest",
   ],
 };
 
@@ -793,9 +785,6 @@ function serviceSearchText(supplier, service) {
 
 function inferHomeBucket(supplier, service) {
   const text = serviceSearchText(supplier, service);
-  if (textContainsAny(text, HOME_BUCKET_KEYWORDS.agriculture)) {
-    return "agriculture";
-  }
   if (textContainsAny(text, HOME_BUCKET_KEYWORDS.buy_materials)) {
     return "buy_materials";
   }
@@ -881,6 +870,12 @@ function applyLanguage(mode) {
   });
 
   document.documentElement.setAttribute("data-ui-lang", normalized);
+  document.documentElement.setAttribute("lang", normalized === "english" ? "en" : "hi");
+  const body = document.body;
+  if (body) {
+    body.classList.toggle("gh-font-en", normalized === "english");
+    body.classList.toggle("gh-font-hi", normalized !== "english");
+  }
   localStorage.setItem(UI_LANG_STORAGE_KEY, normalized);
   setLanguageButtonState(normalized);
 
@@ -1037,6 +1032,20 @@ function escapeHtml(value) {
     .replace(/'/g, "&#39;");
 }
 
+function showToast({ title = "GraminHub", message, variant = "info", timeoutMs = 3500 } = {}) {
+  const wrap = document.getElementById("toastWrap");
+  if (!wrap || !message) return;
+  const toast = document.createElement("div");
+  const safeVariant = ["success", "error", "info"].includes(variant) ? variant : "info";
+  toast.className = `gh-toast gh-toast-${safeVariant}`;
+  toast.innerHTML = `
+    <div class="gh-toast-title">${escapeHtml(title)}</div>
+    <div class="gh-toast-body">${escapeHtml(message)}</div>
+  `;
+  wrap.appendChild(toast);
+  window.setTimeout(() => toast.remove(), timeoutMs);
+}
+
 function ratingStars(value) {
   const safe = Math.max(0, Math.min(5, Number(value || 0)));
   const rounded = Math.round(safe);
@@ -1052,9 +1061,67 @@ function setText(id, value) {
 }
 
 function setJSON(id, value) {
-  const payload =
-    value && typeof value === "object" && value.data !== undefined ? value.data : value;
-  setText(id, JSON.stringify(payload, null, 2));
+  const wrapped =
+    value && typeof value === "object" && value.status !== undefined && value.data !== undefined;
+  const status = wrapped ? Number(value.status) : 200;
+  const payload = wrapped ? value.data : value;
+  const debugRaw = localStorage.getItem("gh_debug") === "1";
+
+  if (debugRaw) {
+    setText(id, JSON.stringify(payload, null, 2));
+    return;
+  }
+
+  const message = summarizePayload(payload, status);
+  setText(id, message);
+
+  if (["loginResult", "profileResult", "actionResult", "supplierResult", "supplierManageOutput", "adminOutput"].includes(id)) {
+    showToast({
+      title: "GraminHub",
+      message: message.split("\n")[0].slice(0, 160),
+      variant: status >= 400 ? "error" : "success",
+    });
+  }
+}
+
+function summarizePayload(payload, status = 200) {
+  if (payload === null || payload === undefined) {
+    return status >= 400 ? "Request failed." : "Done.";
+  }
+
+  if (typeof payload === "string") {
+    return payload;
+  }
+
+  if (Array.isArray(payload)) {
+    if (payload.length === 0) return t("home_no_suppliers");
+    return `Results: ${payload.length}`;
+  }
+
+  if (typeof payload === "object") {
+    if (payload.detail) return String(payload.detail);
+    if (payload.message) return String(payload.message);
+    if (payload.access_token) return "Login successful. Redirecting…";
+
+    const looksLikeUser =
+      payload.id !== undefined &&
+      payload.name !== undefined &&
+      payload.role !== undefined &&
+      (payload.email !== undefined || payload.phone !== undefined);
+    if (looksLikeUser) {
+      const lines = [];
+      lines.push(`${t("profile_name_label")}: ${payload.name}`);
+      if (payload.email) lines.push(`${t("profile_email_label")}: ${payload.email}`);
+      if (payload.phone) lines.push(`${t("profile_phone_label")}: ${payload.phone}`);
+      lines.push(`${t("nav_role_prefix")} ${roleLabel(payload.role)}`);
+      return lines.join("\n");
+    }
+
+    if (payload.booking_id) return `Booking created: #${payload.booking_id}`;
+    if (payload.id !== undefined) return `Saved. ID: ${payload.id}`;
+  }
+
+  return status >= 400 ? "Request failed." : "Done.";
 }
 
 async function requestJSON(path, options = {}) {
@@ -1438,28 +1505,85 @@ async function verifyPhoneOtpLogin() {
 }
 
 async function loadCategories() {
-  const select = document.getElementById("categorySelect");
   const out = await requestJSON("/api/suppliers/categories");
   if (out.status !== 200 || !Array.isArray(out.data)) {
     return;
   }
 
   categoryNameById = {};
+  categoryList = [];
   out.data.forEach((category) => {
     categoryNameById[category.id] = category.name;
+    categoryList.push(category);
   });
 
+  populateCategorySelect("categorySelect", { includeAllOption: true, includeDisabled: true });
+  populateCategorySelect("svcCategoryId", { enabledOnly: true, placeholder: "Select category" });
+  populateCategorySelect("editSvcCategoryId", { enabledOnly: true, placeholder: "Select category" });
+  renderComingSoonCategories();
+}
+
+function populateCategorySelect(
+  selectId,
+  { includeAllOption = false, includeDisabled = false, enabledOnly = false, placeholder = "" } = {},
+) {
+  const select = document.getElementById(selectId);
   if (!select) return;
   const previousSelection = select.value;
-  const options = [`<option value="">${escapeHtml(t("category_all"))}</option>`];
-  out.data.forEach((category) => {
+
+  const options = [];
+  if (placeholder) {
+    options.push(`<option value="">${escapeHtml(placeholder)}</option>`);
+  } else if (includeAllOption) {
+    options.push(`<option value="">${escapeHtml(t("category_all"))}</option>`);
+  } else {
+    options.push(`<option value="">${escapeHtml(t("home_category_label"))}</option>`);
+  }
+
+  const enabled = categoryList.filter((category) => Boolean(category?.is_enabled));
+  const disabled = categoryList.filter((category) => category?.is_enabled === false);
+
+  enabled.forEach((category) => {
     options.push(`<option value="${category.id}">${escapeHtml(category.name)}</option>`);
   });
-  select.innerHTML = options.join("");
 
-  if (previousSelection && out.data.some((category) => String(category.id) === previousSelection)) {
+  if (!enabledOnly && includeDisabled) {
+    disabled.forEach((category) => {
+      options.push(
+        `<option value="${category.id}" disabled>${escapeHtml(category.name)} (Coming Soon)</option>`,
+      );
+    });
+  }
+
+  select.innerHTML = options.join("");
+  if (previousSelection && categoryList.some((category) => String(category.id) === previousSelection)) {
     select.value = previousSelection;
   }
+}
+
+function renderComingSoonCategories() {
+  const wrap = document.getElementById("comingSoonCategories");
+  if (!wrap) return;
+  const disabled = categoryList.filter((category) => category?.is_enabled === false);
+  if (!disabled.length) {
+    wrap.innerHTML = `<div class="rounded-xl border border-dashed border-slate-300 bg-white/80 p-3 text-sm text-slate-600">No upcoming categories.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = disabled
+    .map((category) => {
+      const icon = CATEGORY_UI_CONFIG[category.key]?.icon || "fa-regular fa-clock";
+      return `
+        <article class="gh-coming-soon-card">
+          <p class="gh-badge-soon"><i class="fa-regular fa-clock"></i> Coming Soon</p>
+          <h3 class="mt-2 font-display text-lg font-bold text-slate-900">
+            <i class="${escapeHtml(icon)} mr-2 text-brand-700"></i>${escapeHtml(category.name)}
+          </h3>
+          <p class="mt-1 text-sm text-slate-600">This category will be available soon. Stay connected with GraminHub.</p>
+        </article>
+      `;
+    })
+    .join("");
 }
 
 function itemPhotoUrls(service) {
@@ -1542,11 +1666,13 @@ function supplierItemCardMarkup(supplier, service) {
           )} ${supplier.id}</span>
         </div>
         <p class="mt-1 text-sm text-slate-600">${escapeHtml(supplier.address)}</p>
-        <p class="mt-1 text-sm font-semibold text-slate-800">${escapeHtml(
-          t("home_contact_number"),
-        )} <a class="text-blue-700 hover:underline" href="tel:${escapeHtml(supplier.phone)}">${escapeHtml(
-          supplier.phone,
-        )}</a></p>
+        ${
+          siteSettings.show_supplier_phone && supplier.phone
+            ? `<p class="mt-1 text-sm font-semibold text-slate-800">${escapeHtml(
+                t("home_contact_number"),
+              )} <span class="text-slate-900">${escapeHtml(supplier.phone)}</span></p>`
+            : `<p class="mt-1 text-sm font-semibold text-slate-500">${escapeHtml(t("home_contact_number"))} Hidden</p>`
+        }
         <p class="mt-1 text-sm text-amber-700">
           ${escapeHtml(t("home_rating_label"))} ${ratingStars(supplier.average_rating)} (${Number(
             supplier.average_rating || 0,
@@ -1555,12 +1681,20 @@ function supplierItemCardMarkup(supplier, service) {
       </div>
 
       <div class="mt-4 flex flex-wrap gap-2">
-        <button onclick="callSupplier(${supplier.id})" class="rounded-xl bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700">${escapeHtml(
-          t("home_call_btn"),
-        )}</button>
-        <button onclick="bookViaWhatsApp(${supplier.id})" class="rounded-xl bg-green-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-green-700">${escapeHtml(
-          t("home_book_whatsapp_btn"),
-        )}</button>
+        ${
+          siteSettings.enable_supplier_call
+            ? `<button onclick="callSupplier(${supplier.id})" class="rounded-xl bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700">${escapeHtml(
+                t("home_call_btn"),
+              )}</button>`
+            : ""
+        }
+        ${
+          siteSettings.enable_supplier_whatsapp
+            ? `<button onclick="bookViaWhatsApp(${supplier.id})" class="rounded-xl bg-green-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-green-700">${escapeHtml(
+                t("home_book_whatsapp_btn"),
+              )}</button>`
+            : ""
+        }
         <button onclick="rateSupplier(${supplier.id})" class="rounded-xl bg-amber-500 px-3 py-2 text-sm font-semibold text-white transition hover:bg-amber-600">${escapeHtml(
           t("home_rate_btn"),
         )}</button>
@@ -1622,21 +1756,72 @@ function homeCategoryItemCardMarkup(supplier, service) {
           ? `<p class="mt-1 text-xs text-slate-600">${escapeHtml(service.item_details)}</p>`
           : ""
       }
-      <p class="mt-1 text-xs font-semibold text-slate-800">${escapeHtml(supplier.business_name)} | ${escapeHtml(
-        supplier.phone,
-      )}</p>
+      <p class="mt-1 text-xs font-semibold text-slate-800">${escapeHtml(supplier.business_name)}${
+        siteSettings.show_supplier_phone && supplier.phone ? ` | ${escapeHtml(supplier.phone)}` : ""
+      }</p>
       <div class="mt-2 flex flex-wrap gap-2">
-        <button onclick="callSupplier(${supplier.id})" class="rounded-lg bg-blue-600 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700">${escapeHtml(
-          t("home_call_btn"),
-        )}</button>
-        <button onclick="bookViaWhatsApp(${supplier.id})" class="rounded-lg bg-green-600 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-green-700">${escapeHtml(
-          t("home_book_whatsapp_btn"),
-        )}</button>
+        ${
+          siteSettings.enable_supplier_call
+            ? `<button onclick="callSupplier(${supplier.id})" class="rounded-lg bg-blue-600 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700">${escapeHtml(
+                t("home_call_btn"),
+              )}</button>`
+            : ""
+        }
+        ${
+          siteSettings.enable_supplier_whatsapp
+            ? `<button onclick="bookViaWhatsApp(${supplier.id})" class="rounded-lg bg-green-600 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-green-700">${escapeHtml(
+                t("home_book_whatsapp_btn"),
+              )}</button>`
+            : ""
+        }
         <button onclick="rateSupplier(${supplier.id})" class="rounded-lg bg-amber-500 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-amber-600">${escapeHtml(
           t("home_rate_btn"),
         )}</button>
       </div>
     </article>`;
+}
+
+async function loadSiteSettingsPublic() {
+  const out = await requestJSON("/api/public/site-settings");
+  if (out.status !== 200 || !out.data) return;
+  siteSettings = { ...siteSettings, ...out.data };
+}
+
+async function loadSiteSettingsForAdmin() {
+  if (!requireRole("admin", "adminOutput", "admin_auth_required")) return;
+  const out = await requestJSON("/api/admin/site-settings");
+  if (handleUnauthorizedResult(out, "adminOutput")) return;
+  if (out.status === 200) {
+    const showPhone = document.getElementById("settingShowPhone");
+    const enableCall = document.getElementById("settingEnableCall");
+    const enableWhatsapp = document.getElementById("settingEnableWhatsapp");
+    if (showPhone) showPhone.checked = Boolean(out.data.show_supplier_phone);
+    if (enableCall) enableCall.checked = Boolean(out.data.enable_supplier_call);
+    if (enableWhatsapp) enableWhatsapp.checked = Boolean(out.data.enable_supplier_whatsapp);
+    setText("adminOutput", "Settings loaded.");
+  } else {
+    setJSON("adminOutput", out);
+  }
+}
+
+async function saveSiteSettingsForAdmin() {
+  if (!requireRole("admin", "adminOutput", "admin_auth_required")) return;
+  const showPhone = document.getElementById("settingShowPhone")?.checked ?? true;
+  const enableCall = document.getElementById("settingEnableCall")?.checked ?? true;
+  const enableWhatsapp = document.getElementById("settingEnableWhatsapp")?.checked ?? true;
+  const payload = {
+    show_supplier_phone: showPhone,
+    enable_supplier_call: enableCall,
+    enable_supplier_whatsapp: enableWhatsapp,
+  };
+  const out = await requestJSON("/api/admin/site-settings", { method: "PUT", body: JSON.stringify(payload) });
+  if (handleUnauthorizedResult(out, "adminOutput")) return;
+  if (out.status === 200) {
+    setText("adminOutput", "Settings saved.");
+    await loadSiteSettingsPublic();
+  } else {
+    setJSON("adminOutput", out);
+  }
 }
 
 function homeColumnFilterValue(bucketKey) {
@@ -1824,6 +2009,38 @@ function isLikelyPhoneNumber(raw) {
   return digits.length >= 7 && digits.length <= 15;
 }
 
+function normalizeDialPhone(raw) {
+  const digits = String(raw || "").replace(/\D/g, "");
+  if (!digits) return "";
+  if (digits.length === 10) return `+91${digits}`;
+  if (digits.length === 11 && digits.startsWith("0")) return `+91${digits.slice(1)}`;
+  if (digits.startsWith("91") && digits.length === 12) return `+${digits}`;
+  if (digits.startsWith("0") && digits.length > 1) return `+${digits.slice(1)}`;
+  return digits.startsWith("+") ? digits : `+${digits}`;
+}
+
+function isMobileDevice() {
+  return /Android|iPhone|iPad|iPod|Mobi/i.test(navigator.userAgent || "");
+}
+
+function triggerPhoneCall(rawPhone) {
+  const phone = normalizeDialPhone(rawPhone);
+  if (!phone) return false;
+
+  if (!isMobileDevice()) {
+    showToast({ title: "Call", message: `Call this number: ${phone}`, variant: "info", timeoutMs: 6000 });
+    return false;
+  }
+
+  const link = document.createElement("a");
+  link.href = `tel:${phone}`;
+  link.style.display = "none";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  return true;
+}
+
 async function callSupplier(supplierId) {
   const supplier = supplierCache[supplierId];
   const token = localStorage.getItem("access_token");
@@ -1831,7 +2048,7 @@ async function callSupplier(supplierId) {
   if (!token) {
     if (supplier && supplier.phone) {
       setText("actionResult", formatMessage(t("action_guest_direct_call"), { phone: supplier.phone }));
-      window.location.href = `tel:${supplier.phone}`;
+      triggerPhoneCall(supplier.phone);
       return;
     }
     setText("actionResult", t("action_supplier_phone_unavailable"));
@@ -1848,6 +2065,9 @@ async function callSupplier(supplierId) {
         phone: out.data.phone,
       }),
     );
+    if (out.data?.phone) {
+      triggerPhoneCall(out.data.phone);
+    }
     return;
   }
   setJSON("actionResult", out);
@@ -1866,6 +2086,8 @@ async function bookViaWhatsApp(supplierId) {
     setText("actionResult", t("buyer_action_only"));
     return;
   }
+  // Pre-open the tab to avoid popup blockers (some browsers block window.open after async awaits).
+  const pendingTab = window.open("", "_blank");
   let out;
 
   if (token) {
@@ -1880,12 +2102,14 @@ async function bookViaWhatsApp(supplierId) {
 
     const guestName = prefilledGuestName || window.prompt(t("prompt_guest_name"), "");
     if (guestName === null || guestName.trim().length < 2) {
+      if (pendingTab) pendingTab.close();
       setText("actionResult", t("error_guest_name"));
       return;
     }
 
     const guestPhone = prefilledGuestPhone || window.prompt(t("prompt_guest_phone"), "");
     if (guestPhone === null || !isLikelyPhoneNumber(guestPhone)) {
+      if (pendingTab) pendingTab.close();
       setText("actionResult", t("error_guest_phone"));
       return;
     }
@@ -1905,6 +2129,7 @@ async function bookViaWhatsApp(supplierId) {
 
   if (out.status !== 200) {
     if (handleUnauthorizedResult(out, "actionResult")) return;
+    if (pendingTab) pendingTab.close();
     setJSON("actionResult", out);
     return;
   }
@@ -1918,7 +2143,13 @@ async function bookViaWhatsApp(supplierId) {
   );
 
   if (out.data.whatsapp_url) {
-    window.open(out.data.whatsapp_url, "_blank");
+    if (pendingTab) {
+      pendingTab.location.href = out.data.whatsapp_url;
+    } else {
+      window.open(out.data.whatsapp_url, "_blank");
+    }
+  } else if (pendingTab) {
+    pendingTab.close();
   }
 }
 
@@ -2379,7 +2610,7 @@ async function createCategory() {
     setText("adminOutput", t("error_category_name_required"));
     return;
   }
-  const payload = { name: categoryName };
+  const payload = { name: categoryName, is_enabled: false };
   const out = await requestJSON("/api/admin/categories", { method: "POST", body: JSON.stringify(payload) });
   if (handleUnauthorizedResult(out, "adminOutput")) return;
   setJSON("adminOutput", out);
@@ -2423,6 +2654,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   initSearchInputHandlers();
   initHomeCategoryFilters();
 
+  // Default font mode aligns with language toggle.
+  const body = document.body;
+  if (body) {
+    body.classList.add(getLangMode() === "english" ? "gh-font-en" : "gh-font-hi");
+  }
+
   const urlParams = new URLSearchParams(window.location.search);
   const prefillKeyword = (urlParams.get("keyword") || urlParams.get("q") || "").trim();
   const globalInput = document.getElementById("globalSearchInput");
@@ -2430,6 +2667,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     globalInput.value = prefillKeyword;
   }
 
+  await loadSiteSettingsPublic();
   const currentUser = await refreshCurrentUser();
   enforcePageAccess(currentUser);
   await loadCategories();

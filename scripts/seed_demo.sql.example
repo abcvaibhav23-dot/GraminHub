@@ -1,13 +1,24 @@
 -- Demo data seed for marketplace (idempotent).
 -- Login mode: phone + OTP only.
+--
+-- NOTE: Keep this file as an example/template in git.
+-- For local-only demo data, copy it to scripts/seed_demo.sql (ignored by .gitignore).
+
+-- Ensure category feature-flag columns exist (older DBs).
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS key VARCHAR(80);
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS is_enabled BOOLEAN NOT NULL DEFAULT TRUE;
+CREATE UNIQUE INDEX IF NOT EXISTS ux_categories_key ON categories (key);
 
 -- Ensure core categories exist.
-INSERT INTO categories (name) VALUES
-  ('Construction Materials'),
-  ('Heavy Vehicles'),
-  ('Transport Vehicles'),
-  ('Equipment Rentals')
-ON CONFLICT (name) DO NOTHING;
+INSERT INTO categories (key, name, is_enabled) VALUES
+  ('building_material', 'Building Materials', TRUE),
+  ('vehicle_booking', 'Vehicle Booking', TRUE),
+  ('agriculture_supplies', 'Agriculture Supplies', FALSE),
+  ('equipment_rental', 'Equipment Rental', FALSE),
+  ('local_services', 'Local Services', FALSE)
+ON CONFLICT (key) DO UPDATE
+SET name = EXCLUDED.name,
+    is_enabled = EXCLUDED.is_enabled;
 
 -- Shared hash for internal/demo records (password not used in OTP login).
 -- Hash type: pbkdf2_sha256
@@ -67,7 +78,7 @@ SELECT s.id, c.id, 'PPC Cement', 'Fresh stock for bulk orders', '50kg bag',
        NULL, 420.00, 'in stock'
 FROM suppliers s
 JOIN users u ON u.id = s.user_id
-JOIN categories c ON c.name = 'Construction Materials'
+JOIN categories c ON c.key = 'building_material'
 WHERE u.email = 'otp.supplier.919000000003@graminhub.local';
 
 INSERT INTO supplier_services (
@@ -78,7 +89,7 @@ SELECT s.id, c.id, 'River Sand', 'Washed river sand for slab work', 'Per tractor
        NULL, NULL, NULL, 1800.00, 'available on request'
 FROM suppliers s
 JOIN users u ON u.id = s.user_id
-JOIN categories c ON c.name = 'Construction Materials'
+JOIN categories c ON c.key = 'building_material'
 WHERE u.email = 'otp.supplier.919000000003@graminhub.local';
 
 INSERT INTO supplier_services (
@@ -90,7 +101,7 @@ SELECT s.id, c.id, '12-Wheeler Truck', 'Ideal for cement and balu transport', 'P
        NULL, NULL, 12000.00, 'available on request'
 FROM suppliers s
 JOIN users u ON u.id = s.user_id
-JOIN categories c ON c.name = 'Transport Vehicles'
+JOIN categories c ON c.key = 'vehicle_booking'
 WHERE u.email = 'otp.supplier.919000000004@graminhub.local';
 
 INSERT INTO supplier_services (
@@ -103,7 +114,7 @@ SELECT s.id, c.id, 'Hydra Crane', 'Site loading and heavy lifting', '12 ton',
        NULL, 15000.00, 'book 1 day prior'
 FROM suppliers s
 JOIN users u ON u.id = s.user_id
-JOIN categories c ON c.name = 'Heavy Vehicles'
+JOIN categories c ON c.key = 'vehicle_booking'
 WHERE u.email = 'otp.supplier.919000000004@graminhub.local';
 
 -- Demo booking.

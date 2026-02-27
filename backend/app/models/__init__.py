@@ -5,6 +5,7 @@ from app.models.booking import Booking
 from app.models.review import Review
 from app.models.call_log import CallLog
 from app.models.otp_challenge import OtpChallenge
+from app.models.site_setting import SiteSetting
 
 __all__ = [
     "User",
@@ -15,4 +16,5 @@ __all__ = [
     "Review",
     "CallLog",
     "OtpChallenge",
+    "SiteSetting",
 ]

@@ -38,6 +38,7 @@ from app.services.supplier_service import (
     update_supplier_profile,
     update_supplier_service,
 )
+from app.services.site_setting_service import get_site_settings, seed_site_settings
 
 
 router = APIRouter(prefix="/api/suppliers", tags=["suppliers"])
@@ -45,7 +46,7 @@ router = APIRouter(prefix="/api/suppliers", tags=["suppliers"])
 
 @router.get("/categories", response_model=list[CategoryOut])
 def list_supplier_categories_endpoint(db: Session = Depends(get_db)) -> list[CategoryOut]:
-    return db.query(Category).order_by(Category.name.asc()).all()
+    return db.query(Category).order_by(Category.is_enabled.desc(), Category.name.asc()).all()
 
 
 @router.get("/search", response_model=list[SupplierOut])
@@ -55,10 +56,14 @@ def search_suppliers_endpoint(
     keyword: Optional[str] = Query(default=None, min_length=1),
     db: Session = Depends(get_db),
 ) -> list[SupplierOut]:
+    seed_site_settings(db)
+    site = get_site_settings(db)
     query_parts = [part.strip() for part in [q, keyword] if part and part.strip()]
     combined_query = " ".join(query_parts) if query_parts else None
     suppliers = search_suppliers(db, category_id=category_id, query_text=combined_query)
     for supplier in suppliers:
+        if not site.get("show_supplier_phone", True):
+            supplier.phone = ""
         supplier.services = [
             service
             for service in supplier.services
@@ -72,6 +77,8 @@ def search_suppliers_endpoint(
 
 @router.get("/{supplier_id}", response_model=SupplierOut)
 def get_supplier_details_endpoint(supplier_id: int, db: Session = Depends(get_db)) -> SupplierOut:
+    seed_site_settings(db)
+    site = get_site_settings(db)
     supplier = (
         db.query(Supplier)
         .filter(Supplier.id == supplier_id, Supplier.approved.is_(True), Supplier.blocked.is_(False))
@@ -79,6 +86,8 @@ def get_supplier_details_endpoint(supplier_id: int, db: Session = Depends(get_db
     )
     if not supplier:
         raise NotFoundError("Supplier not found")
+    if not site.get("show_supplier_phone", True):
+        supplier.phone = ""
     supplier.services = [
         service
         for service in supplier.services
@@ -96,8 +105,11 @@ def call_supplier(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> CallResponse:
+    seed_site_settings(db)
+    site = get_site_settings(db)
     _, supplier = log_supplier_call(db, current_user, supplier_id)
-    return CallResponse(supplier_id=supplier.id, phone=supplier.phone)
+    phone = supplier.phone if site.get("show_supplier_phone", True) else ""
+    return CallResponse(supplier_id=supplier.id, phone=phone)
 
 
 @router.post("/profile", response_model=SupplierOut)

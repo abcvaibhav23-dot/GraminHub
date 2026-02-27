@@ -12,6 +12,8 @@ from app.models.supplier import Supplier
 from app.models.user import User
 from app.schemas.booking_schema import BookingCreate, GuestBookingCreate
 from app.services.user_service import get_or_create_guest_user
+from app.services.site_setting_service import get_site_settings, seed_site_settings
+from app.core.exceptions import ForbiddenError
 
 
 logger = logging.getLogger(__name__)
@@ -71,6 +73,10 @@ def create_booking(db: Session, user: User, payload: BookingCreate) -> Booking:
 
 
 def create_whatsapp_booking(db: Session, user: User, payload: BookingCreate) -> tuple[Booking, str, str]:
+    seed_site_settings(db)
+    site = get_site_settings(db)
+    if not site.get("enable_supplier_whatsapp", True):
+        raise ForbiddenError("Supplier WhatsApp is disabled by owner")
     supplier = _get_approved_supplier(db, payload.supplier_id)
     booking = _create_booking_record(
         db,
@@ -114,6 +120,10 @@ def create_guest_booking(db: Session, payload: GuestBookingCreate) -> Booking:
 
 
 def create_guest_whatsapp_booking(db: Session, payload: GuestBookingCreate) -> tuple[Booking, str, str]:
+    seed_site_settings(db)
+    site = get_site_settings(db)
+    if not site.get("enable_supplier_whatsapp", True):
+        raise ForbiddenError("Supplier WhatsApp is disabled by owner")
     supplier = _get_approved_supplier(db, payload.supplier_id)
     booking = create_guest_booking(db, payload)
 
