@@ -24,6 +24,9 @@ from app.core.seo_keywords import SEO_KEYWORDS, SEO_META_KEYWORDS
 from app.services.supplier_service import seed_default_categories, sync_supplier_id_sequence
 from app.services.site_setting_service import seed_site_settings
 from app import models  # noqa: F401 - ensures model metadata is imported
+from app.domains.bookings.router import router as v2_bookings_router
+from app.domains.suppliers.router import router as v2_suppliers_router
+from app.shared.ai.router import router as v2_ai_router
 
 
 setup_logging()
@@ -90,6 +93,19 @@ async def request_context_middleware(request: Request, call_next):
     return response
 
 
+@app.middleware("http")
+async def security_headers_middleware(request: Request, call_next):
+    response = await call_next(request)
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    # Allow microphone for rural-friendly voice search. Keep camera/geolocation disabled by default.
+    response.headers.setdefault("Permissions-Policy", "geolocation=(), microphone=(self), camera=()")
+    if settings.APP_ENV.lower() == "production":
+        response.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+    return response
+
+
 APP_DIR = Path(__file__).resolve().parent
 app.mount("/static", StaticFiles(directory=APP_DIR / "static"), name="static")
 templates = Jinja2Templates(directory=APP_DIR / "templates")
@@ -98,10 +114,18 @@ templates.env.globals["seo_keywords_meta"] = SEO_META_KEYWORDS
 templates.env.globals["public_support_email"] = settings.PUBLIC_SUPPORT_EMAIL
 templates.env.globals["public_support_phone"] = settings.PUBLIC_SUPPORT_PHONE
 templates.env.globals["public_support_whatsapp"] = settings.PUBLIC_SUPPORT_WHATSAPP
+templates.env.globals["app_env"] = settings.APP_ENV
+templates.env.globals["ui_mode"] = settings.UI_MODE
+templates.env.globals["show_demo_hints"] = settings.SHOW_DEMO_HINTS
+templates.env.globals["ai_search_enabled"] = settings.AI_SEARCH_ENABLED
 
 
 @app.on_event("startup")
 def on_startup() -> None:
+    if settings.DB_BOOTSTRAP_MODE == "migrations":
+        logger.info("DB bootstrap mode is migrations; skipping runtime schema changes and seeding")
+        return
+
     Base.metadata.create_all(bind=engine)
     inspector = inspect(engine)
 
@@ -142,6 +166,12 @@ def on_startup() -> None:
             conn.execute(text("ALTER TABLE users ADD COLUMN blocked BOOLEAN NOT NULL DEFAULT FALSE"))
         logger.info("Schema updated: added users.blocked column")
 
+    site_setting_columns = {col["name"] for col in inspector.get_columns("site_settings")}
+    if "str_value" not in site_setting_columns:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE site_settings ADD COLUMN str_value VARCHAR(500)"))
+        logger.info("Schema updated: added site_settings.str_value column")
+
     supplier_service_columns = {col["name"] for col in inspector.get_columns("supplier_services")}
     if "item_name" not in supplier_service_columns:
         with engine.begin() as conn:
@@ -167,6 +197,14 @@ def on_startup() -> None:
         with engine.begin() as conn:
             conn.execute(text("ALTER TABLE supplier_services ADD COLUMN photo_url_3 VARCHAR(500)"))
         logger.info("Schema updated: added supplier_services.photo_url_3 column")
+    if "price_unit_type" not in supplier_service_columns:
+        with engine.begin() as conn:
+            conn.execute(
+                text(
+                    "ALTER TABLE supplier_services ADD COLUMN price_unit_type VARCHAR(40) NOT NULL DEFAULT 'per_item'"
+                )
+            )
+        logger.info("Schema updated: added supplier_services.price_unit_type column")
 
     if engine.dialect.name == "postgresql":
         with engine.begin() as conn:
@@ -259,17 +297,35 @@ async def generic_exception_handler(_: Request, exc: Exception):
 
 @app.get("/")
 def home(request: Request):
-    return templates.TemplateResponse("home.html", {"request": request, "year": datetime.utcnow().year})
+    template_name = "v2/home.html" if settings.UI_MODE == "v2" else "home.html"
+    return templates.TemplateResponse(template_name, {"request": request, "year": datetime.utcnow().year})
+
+
+@app.get("/v2")
+def home_v2(request: Request):
+    return templates.TemplateResponse("v2/home.html", {"request": request, "year": datetime.utcnow().year})
 
 
 @app.get("/login")
 def login_page(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
+    template_name = "v2/login.html" if settings.UI_MODE == "v2" else "login.html"
+    return templates.TemplateResponse(template_name, {"request": request})
+
+
+@app.get("/v2/login")
+def login_page_v2(request: Request):
+    return templates.TemplateResponse("v2/login.html", {"request": request})
 
 
 @app.get("/register")
 def register_page(request: Request):
-    return templates.TemplateResponse("register.html", {"request": request})
+    template_name = "v2/register.html" if settings.UI_MODE == "v2" else "register.html"
+    return templates.TemplateResponse(template_name, {"request": request})
+
+
+@app.get("/v2/register")
+def register_page_v2(request: Request):
+    return templates.TemplateResponse("v2/register.html", {"request": request})
 
 
 @app.get("/privacy")
@@ -334,3 +390,8 @@ app.include_router(suppliers.router)
 app.include_router(bookings.router)
 app.include_router(public.router)
 app.include_router(admin.router)
+
+# v2 (Clean Architecture) routers are mounted alongside v1 during migration.
+app.include_router(v2_suppliers_router)
+app.include_router(v2_bookings_router)
+app.include_router(v2_ai_router)

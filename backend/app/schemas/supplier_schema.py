@@ -19,6 +19,7 @@ class SupplierServiceCreate(BaseModel):
     photo_url_2: str | None = Field(default=None, max_length=500)
     photo_url_3: str | None = Field(default=None, max_length=500)
     price: float | None = Field(default=None, gt=0)
+    price_unit_type: str = Field(default="per_item", max_length=40)
     availability: str = Field(default="available", max_length=120)
 
 
@@ -31,6 +32,7 @@ class SupplierServiceUpdate(BaseModel):
     photo_url_2: str | None = Field(default=None, max_length=500)
     photo_url_3: str | None = Field(default=None, max_length=500)
     price: float | None = Field(default=None, gt=0)
+    price_unit_type: str | None = Field(default=None, max_length=40)
     availability: str | None = Field(default=None, max_length=120)
 
 
@@ -47,6 +49,7 @@ class SupplierServiceOut(BaseModel):
     photo_url_2: str | None = None
     photo_url_3: str | None = None
     price: float | None = None
+    price_unit_type: str
     availability: str
 
 

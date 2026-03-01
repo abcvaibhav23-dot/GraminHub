@@ -32,8 +32,9 @@
         <div class="space-y-3">
           <select id="svcCategoryId" class="gh-input w-full rounded-xl px-3 py-2.5"></select>
           <input id="svcItemName" data-ui-placeholder="supplier_service_item_name_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="आइटम नाम (जैसे PPC Cement)" />
-          <input id="svcItemVariant" data-ui-placeholder="supplier_service_item_variant_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="वैरायटी / ग्रेड (जैसे 50kg bag)" />
+          <input id="svcItemVariant" data-ui-placeholder="supplier_service_item_variant_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="वैरायटी / यूनिट (जैसे: 50kg bag, प्रति ट्रिप, प्रति दिन)" />
           <textarea id="svcItemDetails" data-ui-placeholder="supplier_service_item_details_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" rows="2" placeholder="आइटम विवरण (optional)"></textarea>
+          <select id="svcPriceUnitType" class="gh-input w-full rounded-xl px-3 py-2.5"></select>
           <input id="svcPrice" data-ui-placeholder="supplier_service_price_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" type="number" step="0.01" placeholder="कीमत" />
           <input id="svcAvailability" data-ui-placeholder="supplier_service_availability_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="उपलब्धता (available/on request)" value="available" />
           <input id="svcPhoto1" data-ui-placeholder="supplier_service_photo_1_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="Photo URL 1" />
@@ -84,6 +85,7 @@
               <input id="editSvcItemName" data-ui-placeholder="supplier_service_item_name_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="आइटम नाम" />
               <input id="editSvcItemVariant" data-ui-placeholder="supplier_service_item_variant_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="वैरायटी / ग्रेड" />
               <textarea id="editSvcItemDetails" data-ui-placeholder="supplier_service_item_details_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" rows="2" placeholder="आइटम विवरण"></textarea>
+              <select id="editSvcPriceUnitType" class="gh-input w-full rounded-xl px-3 py-2.5"></select>
               <input id="editSvcPrice" data-ui-placeholder="supplier_service_price_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" type="number" step="0.01" placeholder="कीमत" />
               <input id="editSvcAvailability" data-ui-placeholder="supplier_service_availability_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="उपलब्धता (available/on request)" />
               <input id="editSvcPhoto1" data-ui-placeholder="supplier_service_photo_1_placeholder" class="gh-input w-full rounded-xl px-3 py-2.5" placeholder="Photo URL 1" />

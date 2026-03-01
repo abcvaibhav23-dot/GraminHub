@@ -1,0 +1,2 @@
+"""Bookings domain tests."""
+

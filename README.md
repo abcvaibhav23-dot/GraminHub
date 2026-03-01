@@ -2,6 +2,21 @@
 
 Rural supplier marketplace MVP built with FastAPI, PostgreSQL, Jinja2, and Tailwind.
 
+## 0) GraminHub v2 (What’s New Here)
+
+This repo currently ships:
+
+- **v1**: existing MVP UI + APIs (`/`, `/login`, `/api/*`)
+- **v2 (incremental)**:
+  - Simplified rural-first UI (category-wise homepage + Hindi/English toggle)
+  - Clean-architecture domain scaffold + first v2 vertical slice (suppliers + bookings state machines)
+  - v2 APIs mounted at:
+    - `GET/POST /api/v2/suppliers/*`
+    - `GET/POST /api/v2/bookings/*`
+
+To serve the new simplified UI at `/`, set:
+- `UI_MODE=v2`
+
 ## 1) What This Repository Contains
 
 - Role-based platform: `guest`, `user`, `supplier`, `admin`
@@ -84,6 +99,9 @@ Main variables:
 | `APP_NAME` | Application name | `GraminHub` |
 | `APP_ENV` | Environment | `development` / `production` |
 | `DEBUG` | Debug mode | `0` |
+| `UI_MODE` | UI version | `v2` |
+| `SHOW_DEMO_HINTS` | show demo blocks in UI | `0` |
+| `DB_BOOTSTRAP_MODE` | DB startup behavior | `runtime` (dev) / `migrations` (prod) |
 | `DATABASE_URL` | SQLAlchemy connection URL | `postgresql+psycopg2://...` |
 | `JWT_SECRET_KEY` | JWT signing key | long random string |
 | `JWT_ALGORITHM` | JWT algorithm | `HS256` |
@@ -95,6 +113,10 @@ Main variables:
 | `PUBLIC_SUPPORT_EMAIL` | public support email in UI | `support@example.com` |
 | `PUBLIC_SUPPORT_PHONE` | public support phone in UI | `+91-9000000000` |
 | `PUBLIC_SUPPORT_WHATSAPP` | public WhatsApp number in UI | `+91-9000000000` |
+| `AI_SEARCH_ENABLED` | enable AI Search widget on v2 homepage | `0` |
+| `AI_SEARCH_ALLOWED_HOSTS` | allowlist `Host` for AI endpoint (prod hardening) | `www.graminhub.in,www.graminhub.com` |
+| `OPENAI_API_KEY` | OpenAI key (server-side only) | *(set in env)* |
+| `OPENAI_MODEL` | OpenAI model for AI Search | `gpt-5` |
 
 ## 7) Setup And Run
 
@@ -218,6 +240,122 @@ Search options on Home:
 Profile editing:
 
 - Click navbar `Profile` after login
+
+## 11) Role Flows (Demo + Real)
+
+### Buyer/User flow
+
+```mermaid
+flowchart TD
+  A[Open Home] --> B[Search / Pick category]
+  B --> C[See items + supplier cards]
+  C --> D[Call or WhatsApp]
+  D --> E[Optional: OTP Login (no register needed)]
+  E --> F[Track bookings / profile]
+```
+
+### Supplier flow
+
+```mermaid
+flowchart TD
+  A[OTP Login as Supplier] --> B[Create supplier profile]
+  B --> C[Add services/items + price + unit type]
+  C --> D[Submit docs (v2)]
+  D --> E[Owner/Admin verifies]
+  E --> F[Listing appears in search]
+  F --> G[Receive bookings / calls]
+```
+
+### Owner/Admin role (Production guidance)
+
+Admin is an **operations** role, not a normal user role.
+
+- Allowlist: Admin OTP login works only for phone numbers in `ADMIN_PHONE_ALLOWLIST`.
+- Supplier ops: approve/verify suppliers, block/unblock suspicious accounts, handle disputes.
+- Platform controls: enable/disable WhatsApp/call features, monitor booking/call activity.
+- Production requirements:
+  - `OTP_EXPOSE_IN_RESPONSE=0`
+  - Use real OTP delivery (configure `OTP_DELIVERY_MODE` + provider)
+  - Use migrations: `DB_BOOTSTRAP_MODE=migrations` and run Alembic before starting the app
+
+### Production Admin login (real usage)
+
+1. Set env: `APP_ENV=production`, `OTP_EXPOSE_IN_RESPONSE=0`
+2. Add your real admin phone to: `ADMIN_PHONE_ALLOWLIST=+91XXXXXXXXXX`
+3. Configure real OTP delivery (`OTP_DELIVERY_MODE` not `console`)
+4. Restart backend
+5. Open `https://YOUR_DOMAIN/login` → select **Admin** → request OTP → verify OTP → you land on `.../admin-dashboard`
+
+## 12) How To Test Locally (Demo IDs + Your Own Number)
+
+### A) Demo (recommended)
+
+```bash
+cd GraminHub
+docker compose up -d db backend
+make demo-ready
+```
+
+Then open:
+- `http://localhost:8000/`
+- `http://localhost:8000/login`
+
+Use the demo phone numbers from section **9) Demo Data**.
+
+OTP visibility for local testing:
+- If `OTP_EXPOSE_IN_RESPONSE=1`, the OTP is returned in `/api/auth/otp/request` response.
+- If `OTP_DELIVERY_MODE=console`, OTP is printed in backend logs:
+  - `docker compose logs -f backend`
+
+### B) “Real scenario” testing (your own phone/email)
+
+Buyer/Supplier:
+- You can use your own phone number for OTP login in **development**.
+- The system will create the account on first OTP request for that role (separate registration not required).
+
+Admin:
+- You can use your own phone number **only** if you add it to `ADMIN_PHONE_ALLOWLIST` and restart backend.
+
+Email:
+- You can register with any email via `/register` in development.
+- OTP login does not require email.
+
+## 13) E2E / Automated Tests
+
+v1 E2E:
+```bash
+make e2e
+```
+
+v2 E2E:
+```bash
+make e2e-v2
+```
+
+Pytest (inside Docker backend container):
+```bash
+docker compose exec -T backend sh -lc 'cd /app && PYTHONPATH=/app pytest -q'
+```
+
+## 14) Production Checklist (Minimum)
+
+- `APP_ENV=production`
+- `DEBUG=0`
+- `OTP_EXPOSE_IN_RESPONSE=0`
+- Configure OTP delivery (`OTP_DELIVERY_MODE` not `console` in production)
+- `JWT_SECRET_KEY` strong and secret
+- `DB_BOOTSTRAP_MODE=migrations`
+- Apply migrations before starting:
+  - `alembic upgrade head`
+- Set `CORS_ORIGINS` to your real domains only
+
+## 15) Owner/Admin Guide
+
+- Production ops guide: `GraminHub/docs/OWNER_ADMIN_GUIDE.md`
+
+## 16) UI Verification Checklist
+
+- UI checklist (laptop + mobile): `GraminHub/docs/UI_VERIFICATION_CHECKLIST.md`
 - Opens in-page profile panel modal (not a separate workflow page)
 
 Language switch note:

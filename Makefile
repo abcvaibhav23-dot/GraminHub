@@ -1,4 +1,5 @@
 .PHONY: clean clean-all clean-dry clean-generated db-reset db-seed-demo demo-ready db-backup e2e sanity count-files
+.PHONY: e2e-v2
 
 MAX_FILES ?= 75
 
@@ -70,6 +71,10 @@ db-backup:
 # Run live end-to-end API scenario against running backend.
 e2e:
 	@./scripts/e2e.sh
+
+# Run v2 API end-to-end scenario against running backend.
+e2e-v2:
+	@./scripts/e2e_v2.sh
 
 # Count files that should matter for review/merge size.
 count-files:

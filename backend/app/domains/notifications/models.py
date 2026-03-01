@@ -1,0 +1,2 @@
+"""Notifications domain models — v2 scaffold."""
+

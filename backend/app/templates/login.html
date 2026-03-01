@@ -75,13 +75,18 @@
           <button onclick="verifyPhoneOtpLogin()" class="rounded-xl bg-brand-600 px-4 py-2.5 font-semibold text-white transition hover:bg-brand-700">
             <span data-login-i18n="otp_verify_btn">Verify OTP & Login</span>
           </button>
+          {% if show_demo_hints %}
           <p id="otpHint" data-login-i18n="otp_hint" class="text-xs text-slate-600">Demo OTP स्क्रीन पर दिखेगा।</p>
+          {% else %}
+          <p id="otpHint" data-login-i18n="otp_hint" class="text-xs text-slate-600">OTP भेज दिया गया है।</p>
+          {% endif %}
         </div>
       </div>
 
       <div data-login-i18n="token_note" class="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
         इस MVP डेमो में टोकन localStorage में सेव होता है।
       </div>
+      {% if show_demo_hints %}
       <div class="mt-4 rounded-xl border border-emerald-100 bg-emerald-50/70 p-3 text-xs text-slate-700">
         <p data-login-i18n="login_demo_title" class="font-semibold text-emerald-800">लोकल डेमो लॉगिन</p>
         <p data-login-i18n="login_demo_desc" class="mt-1">make demo-ready के बाद इन मोबाइल नंबरों से OTP टेस्ट करें:</p>
@@ -93,6 +98,7 @@
         </ul>
         <p data-login-i18n="login_demo_password_hint" class="mt-2 font-semibold">OTP request के response में demo OTP दिखाई देता है।</p>
       </div>
+      {% endif %}
       <pre id="loginResult" data-login-i18n="result_waiting" class="gh-status-pre mt-4 hidden rounded-xl p-3 text-xs" aria-live="polite"></pre>
       <p class="mt-4 text-sm text-slate-600">
         <span data-login-i18n="no_account">अकाउंट नहीं है?</span>

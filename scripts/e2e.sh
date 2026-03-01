@@ -4,6 +4,14 @@ set -euo pipefail
 BASE_URL="${BASE_URL:-http://localhost:8000}"
 SUFFIX="$(date +%s)"
 
+preflight() {
+  if ! curl -fsS "${BASE_URL}/health" >/dev/null 2>&1; then
+    echo "Backend is not reachable at ${BASE_URL}."
+    echo "Start it first (example): docker compose up -d db backend"
+    exit 1
+  fi
+}
+
 req() {
   local method="$1"
   local path="$2"
@@ -34,12 +42,23 @@ otp_login() {
   local otp_resp
 
   otp_resp="$(req POST /api/auth/otp/request "{\"phone\":\"${phone}\",\"role\":\"${role}\",\"name\":\"${name}\"}")"
+  if ! printf '%s' "$otp_resp" | python3 -c 'import json,sys; json.load(sys.stdin);' >/dev/null 2>&1; then
+    echo "OTP request failed. Response:"
+    printf '%s\n' "$otp_resp"
+    exit 1
+  fi
   local otp_code
-  otp_code="$(printf '%s' "$otp_resp" | json_get otp)"
+  otp_code="$(printf '%s' "$otp_resp" | json_get otp || true)"
+  if [[ -z "${otp_code}" ]]; then
+    echo "OTP_EXPOSE_IN_RESPONSE appears disabled; e2e needs demo OTP exposure."
+    echo "Set OTP_EXPOSE_IN_RESPONSE=1 for local/dev runs."
+    exit 1
+  fi
 
   req POST /api/auth/otp/verify "{\"phone\":\"${phone}\",\"role\":\"${role}\",\"otp\":\"${otp_code}\"}" | json_get access_token
 }
 
+preflight
 echo "Running E2E against ${BASE_URL}"
 
 SUFFIX_TAIL="${SUFFIX: -6}"

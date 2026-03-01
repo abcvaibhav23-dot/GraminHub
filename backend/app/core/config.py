@@ -18,6 +18,18 @@ class Settings:
     APP_NAME: str = os.getenv("APP_NAME", "GraminHub")
     APP_ENV: str = os.getenv("APP_ENV", "development")
     DEBUG: bool = os.getenv("DEBUG", "0") == "1"
+    UI_MODE: str = os.getenv("UI_MODE", "v1").strip().lower()
+    SHOW_DEMO_HINTS: bool = os.getenv(
+        "SHOW_DEMO_HINTS",
+        "0" if os.getenv("APP_ENV", "development").lower() == "production" else "0",
+    ) == "1"
+    # Controls how the DB schema is prepared at startup.
+    # - runtime: legacy MVP behavior (create_all + ad-hoc DDL + seeding in app startup)
+    # - migrations: production-safe mode (requires Alembic migrations pre-applied)
+    DB_BOOTSTRAP_MODE: str = os.getenv(
+        "DB_BOOTSTRAP_MODE",
+        "migrations" if os.getenv("APP_ENV", "development").lower() == "production" else "runtime",
+    ).strip().lower()
     DATABASE_URL: str = os.getenv(
         "DATABASE_URL",
         "sqlite:////tmp/graminhub.db",
@@ -47,12 +59,31 @@ class Settings:
     RATE_LIMIT_PER_MINUTE: int = int(os.getenv("RATE_LIMIT_PER_MINUTE", "120"))
     ADMIN_PHONE_ALLOWLIST: str = os.getenv("ADMIN_PHONE_ALLOWLIST", "9000000001")
 
-    PUBLIC_SUPPORT_EMAIL: str = os.getenv("PUBLIC_SUPPORT_EMAIL", "support@example.com").strip()
-    PUBLIC_SUPPORT_PHONE: str = os.getenv("PUBLIC_SUPPORT_PHONE", "+91-9000000000").strip()
-    PUBLIC_SUPPORT_WHATSAPP: str = os.getenv("PUBLIC_SUPPORT_WHATSAPP", "+91-9000000000").strip()
+    PUBLIC_SUPPORT_EMAIL: str = os.getenv("PUBLIC_SUPPORT_EMAIL", "support@graminhub.in").strip()
+    PUBLIC_SUPPORT_PHONE: str = os.getenv("PUBLIC_SUPPORT_PHONE", "+91-6362272078").strip()
+    PUBLIC_SUPPORT_WHATSAPP: str = os.getenv("PUBLIC_SUPPORT_WHATSAPP", "+91-6362272078").strip()
+
+    # AI Search (ChatGPT-style assistant)
+    AI_SEARCH_ENABLED: bool = os.getenv("AI_SEARCH_ENABLED", "0") == "1"
+    AI_SEARCH_ALLOWED_HOSTS: str = os.getenv(
+        "AI_SEARCH_ALLOWED_HOSTS",
+        "localhost,127.0.0.1,graminhub.in,www.graminhub.in,graminhub.com,www.graminhub.com",
+    )
+    AI_SEARCH_RATE_LIMIT_PER_MINUTE: int = int(os.getenv("AI_SEARCH_RATE_LIMIT_PER_MINUTE", "20"))
+    AI_SEARCH_TIMEOUT_SECONDS: float = float(os.getenv("AI_SEARCH_TIMEOUT_SECONDS", "12"))
+    AI_SEARCH_MAX_QUERY_CHARS: int = int(os.getenv("AI_SEARCH_MAX_QUERY_CHARS", "320"))
+
+    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "").strip()
+    OPENAI_BASE_URL: str = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1").strip()
+    OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-5").strip()
 
 
 settings = Settings()
+
+if settings.UI_MODE not in {"v1", "v2"}:
+    raise RuntimeError("UI_MODE must be 'v1' or 'v2'")
+if settings.DB_BOOTSTRAP_MODE not in {"runtime", "migrations"}:
+    raise RuntimeError("DB_BOOTSTRAP_MODE must be 'runtime' or 'migrations'")
 
 if settings.OTP_CODE_LENGTH < 4 or settings.OTP_CODE_LENGTH > 8:
     raise RuntimeError("OTP_CODE_LENGTH must be between 4 and 8")
@@ -77,6 +108,10 @@ if settings.APP_ENV.lower() == "production":
         raise RuntimeError("OTP_DELIVERY_MODE=console is not allowed in production")
     if settings.OTP_DELIVERY_MODE == "webhook" and not settings.OTP_WEBHOOK_URL:
         raise RuntimeError("OTP_WEBHOOK_URL is required for OTP webhook delivery in production")
+    if not settings.CORS_ORIGINS.strip():
+        raise RuntimeError("CORS_ORIGINS must be set in production")
+    if settings.AI_SEARCH_ENABLED and not settings.OPENAI_API_KEY:
+        raise RuntimeError("OPENAI_API_KEY is required when AI_SEARCH_ENABLED=1")
 
 _default_log_dir = BASE_DIR / "logs"
 try:
