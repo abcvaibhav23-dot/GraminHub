@@ -18,6 +18,10 @@ class Supplier(Base):
     approved: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     blocked: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     featured: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    # Optional per-supplier overrides (NULL = inherit global policy).
+    phone_visible_override: Mapped[bool | None] = mapped_column(Boolean, nullable=True, default=None)
+    call_enabled_override: Mapped[bool | None] = mapped_column(Boolean, nullable=True, default=None)
+    whatsapp_enabled_override: Mapped[bool | None] = mapped_column(Boolean, nullable=True, default=None)
 
     user = relationship("User", back_populates="suppliers")
     services = relationship("SupplierService", back_populates="supplier", cascade="all, delete-orphan")
@@ -40,6 +44,7 @@ class SupplierService(Base):
     photo_url_2: Mapped[str | None] = mapped_column(String(500), nullable=True)
     photo_url_3: Mapped[str | None] = mapped_column(String(500), nullable=True)
     price: Mapped[float | None] = mapped_column(Numeric(10, 2), nullable=True)
+    price_unit_type: Mapped[str] = mapped_column(String(40), nullable=False, default="per_item")
     availability: Mapped[str] = mapped_column(String(120), nullable=False, default="available")
 
     supplier = relationship("Supplier", back_populates="services")

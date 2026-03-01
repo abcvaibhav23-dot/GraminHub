@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Register | GraminHub{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-7xl">
+  <div class="mx-auto max-w-xl rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-sm sm:p-8">
+    <h1 data-ui-i18n="register_title" class="font-display text-3xl font-extrabold text-slate-900">नया अकाउंट बनाएं</h1>
+    <p data-ui-i18n="register_desc" class="mt-2 text-base text-slate-700">एक बार रजिस्टर करें और सप्लायर खोज व बुकिंग शुरू करें।</p>
+
+    <div class="mt-6 grid gap-3">
+      <div>
+        <label data-ui-i18n="register_name_label" for="regName" class="mb-1 block text-sm font-semibold text-slate-800">पूरा नाम</label>
+        <input id="regName" data-ui-placeholder="register_name_placeholder" class="gh-input w-full rounded-xl px-3 py-3 text-base" placeholder="अपना पूरा नाम लिखें" />
+      </div>
+      <div>
+        <label data-ui-i18n="register_email_label" for="regEmail" class="mb-1 block text-sm font-semibold text-slate-800">ईमेल</label>
+        <input id="regEmail" data-ui-placeholder="register_email_placeholder" class="gh-input w-full rounded-xl px-3 py-3 text-base" placeholder="name@example.com" />
+      </div>
+      <div>
+        <label data-ui-i18n="register_phone_label" for="regPhone" class="mb-1 block text-sm font-semibold text-slate-800">मोबाइल नंबर</label>
+        <input id="regPhone" data-ui-placeholder="register_phone_placeholder" class="gh-input w-full rounded-xl px-3 py-3 text-base" placeholder="10-digit mobile number" />
+      </div>
+      <div>
+        <label data-ui-i18n="register_password_label" for="regPassword" class="mb-1 block text-sm font-semibold text-slate-800">पासवर्ड</label>
+        <input id="regPassword" data-ui-placeholder="register_password_placeholder" type="password" class="gh-input w-full rounded-xl px-3 py-3 text-base" placeholder="नया पासवर्ड बनाएं" />
+      </div>
+      <div>
+        <label data-ui-i18n="register_role_label" for="regRole" class="mb-1 block text-sm font-semibold text-slate-800">भूमिका (Role)</label>
+        <select id="regRole" class="gh-input w-full rounded-xl px-3 py-3 text-base">
+          <option data-ui-option="register_role_user" value="user">User (Buyer)</option>
+          <option data-ui-option="register_role_supplier" value="supplier">Supplier</option>
+        </select>
+      </div>
+
+      <button onclick="registerUser()" class="rounded-xl bg-brand-700 px-5 py-3 text-base font-semibold text-white transition hover:bg-brand-900">
+        <span data-ui-i18n="register_button">रजिस्टर करें</span>
+      </button>
+
+      <pre id="registerResult" data-ui-i18n="result_waiting" class="gh-status-pre hidden rounded-xl p-3 text-xs" aria-live="polite"></pre>
+
+      <p class="text-sm text-slate-700">
+        <span data-ui-i18n="register_has_account">पहले से अकाउंट है?</span>
+        <a href="/login" data-ui-i18n="register_login_now" class="ml-1 font-semibold text-brand-700 hover:underline">लॉगिन करें</a>
+      </p>
+      <p class="text-xs text-slate-600">OTP login भी काम करता है। Register सिर्फ profile/email रखने के लिए है।</p>
+    </div>
+  </div>
+</section>
+{% endblock %}
+

@@ -22,8 +22,21 @@ const CATEGORY_UI_CONFIG = {
   local_services: { icon: "fa-solid fa-handshake-angle" },
 };
 
+const PRICE_UNIT_OPTIONS = [
+  "per_item",
+  "per_piece",
+  "per_packet",
+  "per_bag",
+  "per_kg",
+  "per_ton",
+  "per_trip",
+  "per_day",
+  "per_hour",
+  "fixed",
+];
+
 const uiText = {
-  hinglish: {
+  hindi: {
     nav_home: "होम",
     nav_login: "लॉगिन",
     nav_register: "रजिस्टर करें",
@@ -75,6 +88,95 @@ const uiText = {
     home_title: "अब गांव से ही सप्लायर, वाहन और रेंटल सेवा तुरंत बुक करें",
     home_desc:
       "GraminHub पर Book Vehicle, Building Materials और Agriculture सेवाएं एक ही जगह मिलती हैं।",
+    v2_home_title: "क्या चाहिए?",
+    v2_home_subtitle: "श्रेणी चुनें या बस नाम लिखें। फिर Call/WhatsApp से तुरंत बात करें।",
+    v2_home_category_label: "श्रेणी",
+    v2_home_cat_materials_title: "निर्माण सामग्री",
+    v2_home_cat_materials_desc: "सीमेंट • बालू • गिट्टी • स्टील",
+    v2_home_cat_vehicle_title: "वाहन बुकिंग",
+    v2_home_cat_vehicle_desc: "ट्रक • ट्रैक्टर • ट्रॉली",
+    v2_home_need_label: "अपनी जरूरत लिखें",
+    v2_home_need_placeholder: "उदाहरण: 50 सीमेंट बैग, सोनभद्र",
+    v2_home_search_btn: "खोजें",
+    v2_home_ai_btn: "AI मदद",
+    ai_search_title: "AI उत्तर",
+    ai_search_close_btn: "बंद करें",
+    ai_search_apply_btn: "इसी से खोजें",
+    ai_search_note: "प्राइवेसी: आपका सवाल AI provider को भेजा जाएगा ताकि जवाब बन सके।",
+    ai_search_empty: "AI के लिए अपना सवाल/जरूरत लिखें।",
+    ai_search_running: "AI सोच रहा है...",
+    ai_search_disabled: "AI search अभी OFF है। Owner को enable करना होगा।",
+    ai_search_error: "AI search अभी उपलब्ध नहीं है।",
+    ai_search_applied_toast: "AI सुझाव से search चल रहा है: {query}",
+    v2_home_category_hint: "फिर नीचे सप्लायर कार्ड दिखेंगे।",
+    v2_home_help_call: "मदद: कॉल",
+    v2_home_help_whatsapp: "मदद: WhatsApp",
+    v2_home_available_title: "अभी उपलब्ध",
+    v2_home_available_desc: "यहां हर श्रेणी के 2–3 top items दिखते हैं। Search करने पर सभी results दिखेंगे।",
+    v2_home_show_all_btn: "सभी देखें",
+    v2_home_show_less_btn: "कम दिखाएं",
+    v2_home_more_items_hint: "+{count} और आइटम — 'सभी देखें' दबाएं",
+    v2_home_categories_title: "श्रेणियां",
+    v2_home_categories_desc: "श्रेणी चुनकर नीचे 2–3 top items देखें।",
+    v2_about_title: "GraminHub क्या है?",
+    v2_about_desc:
+      "GraminHub गांव-कस्बों के लिए सप्लायर और वाहन सेवाओं का आसान प्लेटफॉर्म है। आप जरूरत लिखें, सप्लायर देखें, और Call/WhatsApp से तुरंत संपर्क करें।",
+    v2_about_point_1: "बड़े बटन, आसान स्क्रीन",
+    v2_about_point_2: "सीधा Call/WhatsApp",
+    v2_about_point_3: "बुकिंग स्टेटस ट्रैकिंग",
+    v2_buyer_title: "Buyer/User कैसे इस्तेमाल करे?",
+    v2_buyer_step_1: "1) Search box में अपनी जरूरत लिखें (जैसे: सीमेंट, ट्रक, ट्रैक्टर)।",
+    v2_buyer_step_2: "2) नीचे category-wise items में से सप्लायर चुनें।",
+    v2_buyer_step_3: "3) “Call” या “WhatsApp” दबाकर सीधे बात करें।",
+    v2_buyer_step_4: "4) बुकिंग ट्रैक करने के लिए OTP से लॉगिन करें।",
+    v2_buyer_tip: "Tip: अपनी जगह (गांव/शहर) और मात्रा जरूर लिखें।",
+    v2_supplier_title: "Supplier कैसे इस्तेमाल करे?",
+    v2_supplier_step_1: "1) OTP से Supplier के रूप में लॉगिन करें।",
+    v2_supplier_step_2: "2) प्रोफाइल बनाएं (नाम, फोन, पता)।",
+    v2_supplier_step_3: "3) अपनी items/services और price जोड़ें।",
+    v2_supplier_step_4: "4) Owner/Admin verification के बाद आपकी लिस्टिंग live होगी।",
+    v2_supplier_tip: "Tip: सही फोन नंबर + साफ पता भरोसा बढ़ाता है।",
+    v2_before_login_title: "लॉगिन से पहले क्या कर सकते हैं?",
+    v2_before_login_1: "Items और suppliers category-wise देखें।",
+    v2_before_login_2: "Search (type/voice) से supplier ढूंढें।",
+    v2_before_login_3: "Call/WhatsApp करके तुरंत बात शुरू करें।",
+    v2_after_login_title: "लॉगिन के बाद क्या extra मिलेगा?",
+    v2_after_login_1: "अपनी बुकिंग status ट्रैक करें।",
+    v2_after_login_2: "Supplier के लिए: प्रोफाइल + items/services manage करें।",
+    v2_after_login_3: "Supplier verification और booking requests dashboard में देखें।",
+    v2_steps_title: "Step-by-step Use Case",
+    v2_steps_desc: "OTP login में अलग से register जरूरी नहीं है — पहली बार OTP लेने पर account अपने-आप बन जाता है।",
+    v2_steps_buyer_title: "Buyer/User",
+    v2_steps_buyer_1: "1) Home पर search box में जरूरत लिखें या voice से बोलें।",
+    v2_steps_buyer_2: "2) नीचे category-wise items में supplier card देखें।",
+    v2_steps_buyer_3: "3) Call/WhatsApp से बात करके price + delivery confirm करें।",
+    v2_steps_buyer_4: "4) Booking status track करने के लिए OTP से login करें (no register needed)।",
+    v2_steps_supplier_title: "Supplier",
+    v2_steps_supplier_1: "1) OTP से Supplier के रूप में login करें।",
+    v2_steps_supplier_2: "2) Supplier Dashboard में प्रोफाइल भरें (business name, phone, address)।",
+    v2_steps_supplier_3: "3) Items/services जोड़ें: item name + unit type (per trip/per day/per bag) + price.",
+    v2_steps_supplier_4: "4) Owner/Admin verification के बाद आपकी listing users को दिखेगी।",
+    v2_steps_admin_title: "Owner/Admin",
+    v2_steps_admin_1: "1) Allowlisted phone से OTP login करें (Owner/Admin)।",
+    v2_steps_admin_2: "2) Admin Dashboard में pending suppliers approve/reject करें।",
+    v2_steps_admin_3: "3) Fraud control: block/unblock, reviews/complaints देखें।",
+    v2_steps_admin_4: "4) Owner settings (Call/WhatsApp enable/disable) manage करें।",
+    v2_tips_title: "सुरक्षा/टिप्स",
+    v2_tips_1: "फोन पर कीमत, डिलीवरी समय, और कुल मात्रा पहले confirm करें।",
+    v2_tips_2: "Unknown लिंक/OTP किसी को न दें।",
+    v2_tips_3: "समस्या हो तो ऊपर “Help: Call/WhatsApp” से संपर्क करें।",
+    v2_admin_prod_title: "Owner/Admin (Production)",
+    v2_admin_prod_desc:
+      "Production में Admin role सिर्फ allowlisted नंबरों के लिए है। Admin का काम ऑपरेशन और सुरक्षा है (रोज़मर्रा buyer/supplier use नहीं)।",
+    v2_admin_prod_1: "Supplier verification/review: documents देखकर verify/reject करें।",
+    v2_admin_prod_2: "Suspicious suppliers/users को block/suspend करें।",
+    v2_admin_prod_3: "WhatsApp/Call enable/disable जैसी owner settings नियंत्रित करें।",
+    v2_admin_prod_note:
+      "Note: Production में `OTP_EXPOSE_IN_RESPONSE=0` रखें और OTP delivery provider (SMS/WhatsApp) configure करें।",
+    v2_home_showcase_title: "कैसे इस्तेमाल करें",
+    v2_home_step_1: "श्रेणी चुनें",
+    v2_home_step_2: "सप्लायर कार्ड देखें",
+    v2_home_step_3: "Call/WhatsApp करें",
     home_logged_in_as: "लॉगिन यूज़र:",
     home_booking_mode: "बुकिंग: Call + WhatsApp",
     home_verified_chip: "Verified local network",
@@ -167,6 +269,13 @@ const uiText = {
     home_support_note: "लोकल टेस्ट के लिए पहले demo data seed करें, फिर demo phone numbers से OTP लॉगिन करें।",
 
     category_all: "सभी श्रेणियां",
+    category_other: "अन्य",
+    select_category: "श्रेणी चुनें",
+    home_contact_hidden: "छुपा हुआ",
+    coming_soon_suffix: " (Coming Soon)",
+    coming_soon_badge: "Coming Soon",
+    coming_soon_empty: "कोई upcoming category नहीं है।",
+    coming_soon_desc: "यह category जल्द available होगी। GraminHub से जुड़े रहें।",
     home_no_suppliers: "इस श्रेणी में अभी कोई approved सप्लायर नहीं मिला।",
     home_supplier_verified: "Verified सप्लायर",
     home_supplier_id_prefix: "आईडी",
@@ -218,6 +327,14 @@ const uiText = {
     otp_title: "Phone OTP Login (User/Supplier/Admin)",
     otp_desc: "Email की जरूरत नहीं। फोन नंबर डालें, OTP लें और लॉगिन करें।",
     otp_admin_note: "Owner/Admin लॉगिन सिर्फ allowlisted नंबरों पर सक्षम है।",
+    v2_login_title: "लॉगिन (OTP)",
+    v2_login_subtitle: "सिर्फ मोबाइल नंबर डालें। OTP आएगा।",
+    v2_login_phone_label: "मोबाइल नंबर",
+    v2_login_role_question: "आप कौन हैं?",
+    v2_login_role_buyer: "Buyer",
+    v2_login_role_supplier: "Supplier",
+    v2_login_role_admin: "Admin",
+    v2_login_otp_label: "OTP",
     otp_phone_placeholder: "फोन नंबर",
     otp_role_user: "Buyer/User",
     otp_role_supplier: "Supplier",
@@ -296,9 +413,21 @@ const uiText = {
     supplier_service_desc: "Item name/details/variant और 2-3 फोटो जोड़ें ताकि यूज़र आपकी लिस्टिंग साफ देखें।",
     supplier_service_category_placeholder: "Category ID (जैसे 2)",
     supplier_service_item_name_placeholder: "आइटम नाम (जैसे PPC Cement)",
-    supplier_service_item_variant_placeholder: "वैरायटी / ग्रेड (जैसे 50kg bag)",
+    supplier_service_item_variant_placeholder: "वैरायटी / यूनिट (जैसे: 50kg bag, प्रति ट्रिप, प्रति दिन)",
     supplier_service_item_details_placeholder: "आइटम विवरण (optional)",
     supplier_service_price_placeholder: "कीमत",
+    supplier_service_price_unit_placeholder: "कीमत किसके हिसाब से?",
+    unit_keep_current: "यूनिट (जैसा है वैसा रखें)",
+    unit_per_item: "प्रति आइटम",
+    unit_per_piece: "प्रति पीस",
+    unit_per_packet: "प्रति पैकेट",
+    unit_per_bag: "प्रति बैग",
+    unit_per_kg: "प्रति किलो",
+    unit_per_ton: "प्रति टन",
+    unit_per_trip: "प्रति ट्रिप",
+    unit_per_day: "प्रति दिन",
+    unit_per_hour: "प्रति घंटा",
+    unit_fixed: "फिक्स्ड",
     supplier_service_availability_placeholder: "उपलब्धता (available/on request)",
     supplier_service_photo_1_placeholder: "Photo URL 1",
     supplier_service_photo_2_placeholder: "Photo URL 2 (optional)",
@@ -354,6 +483,20 @@ const uiText = {
     admin_tab_operations: "Supplier Ops",
     admin_tab_configuration: "Configuration",
     admin_tab_data: "Data & Moderation",
+    admin_contact_controls_title: "संपर्क नियंत्रण",
+    admin_contact_controls_desc: "Owner यहां से Call/WhatsApp buttons, phone visibility, और support नंबर सेट कर सकता है।",
+    admin_setting_show_phone: "Supplier का फोन दिखाएं",
+    admin_setting_enable_call: "Call button ON",
+    admin_setting_enable_whatsapp: "WhatsApp button ON",
+    admin_support_contacts_title: "Public Support नंबर",
+    admin_support_contacts_desc: "Home और top strip में दिखने वाले support contacts. Production में सही नंबर रखें।",
+    admin_support_email_placeholder: "Support email (जैसे support@example.com)",
+    admin_support_phone_placeholder: "Support phone (जैसे +91-9000000000)",
+    admin_support_whatsapp_placeholder: "Support WhatsApp (जैसे +91-9000000000)",
+    admin_settings_load_btn: "Settings लोड करें",
+    admin_settings_save_btn: "Settings सेव करें",
+    admin_settings_loaded: "Settings लोड हो गई।",
+    admin_settings_saved: "Settings सेव हो गई।",
     admin_data_tab_pending: "Pending Suppliers",
     admin_data_tab_bookings: "All Bookings",
     admin_data_tab_delete: "Delete IDs",
@@ -411,6 +554,96 @@ const uiText = {
     home_title: "Find trusted local suppliers and book vehicles nearby",
     home_desc:
       "GraminHub helps you discover building materials and vehicle services from verified local suppliers. More categories are coming soon.",
+    v2_home_title: "What do you need?",
+    v2_home_subtitle: "Pick a category or type your need. Then call or WhatsApp the supplier.",
+    v2_home_category_label: "Category",
+    v2_home_cat_materials_title: "Building materials",
+    v2_home_cat_materials_desc: "Cement • Sand • Stone chips • Steel",
+    v2_home_cat_vehicle_title: "Vehicle booking",
+    v2_home_cat_vehicle_desc: "Truck • Tractor • Trolley",
+    v2_home_need_label: "Type your need",
+    v2_home_need_placeholder: "Example: 50 cement bags, Sonbhadra",
+    v2_home_search_btn: "Search",
+    v2_home_ai_btn: "Ask AI",
+    ai_search_title: "AI Answer",
+    ai_search_close_btn: "Close",
+    ai_search_apply_btn: "Use suggested search",
+    ai_search_note: "Privacy: your query is sent to our AI provider to generate an answer.",
+    ai_search_empty: "Type your question/need for AI.",
+    ai_search_running: "AI is thinking...",
+    ai_search_disabled: "AI search is OFF. Owner needs to enable it.",
+    ai_search_error: "AI search is not available right now.",
+    ai_search_applied_toast: "Running search using AI suggestion: {query}",
+    v2_home_category_hint: "Supplier cards will appear below.",
+    v2_home_help_call: "Help: Call",
+    v2_home_help_whatsapp: "Help: WhatsApp",
+    v2_home_available_title: "Available now",
+    v2_home_available_desc: "We show 2–3 top items per category here. Searching shows all matching results.",
+    v2_home_show_all_btn: "See all",
+    v2_home_show_less_btn: "Show less",
+    v2_home_more_items_hint: "+{count} more items — tap 'See all'",
+    v2_home_categories_title: "Categories",
+    v2_home_categories_desc: "Pick a category to view 2–3 top items below.",
+    v2_about_title: "What is GraminHub?",
+    v2_about_desc:
+      "GraminHub is a simple platform for village-town suppliers and vehicle services. Type your need, view suppliers, and contact instantly via call or WhatsApp.",
+    v2_about_point_1: "Big buttons, simple screens",
+    v2_about_point_2: "Direct Call/WhatsApp",
+    v2_about_point_3: "Booking status tracking",
+    v2_buyer_title: "How a Buyer/User uses it",
+    v2_buyer_step_1: "1) Type your need in the search box (cement, truck, tractor).",
+    v2_buyer_step_2: "2) Pick a supplier from the category-wise items below.",
+    v2_buyer_step_3: "3) Tap “Call” or “WhatsApp” to talk directly.",
+    v2_buyer_step_4: "4) Log in with OTP to track your bookings.",
+    v2_buyer_tip: "Tip: Always include your location and quantity.",
+    v2_supplier_title: "How a Supplier uses it",
+    v2_supplier_step_1: "1) Log in as Supplier using OTP.",
+    v2_supplier_step_2: "2) Create your profile (name, phone, address).",
+    v2_supplier_step_3: "3) Add your items/services and pricing.",
+    v2_supplier_step_4: "4) After Owner/Admin verification, your listing becomes live.",
+    v2_supplier_tip: "Tip: A correct phone number and clear address builds trust.",
+    v2_before_login_title: "What you can do before login",
+    v2_before_login_1: "Browse items and suppliers category-wise.",
+    v2_before_login_2: "Search suppliers using type/voice.",
+    v2_before_login_3: "Call/WhatsApp to talk instantly.",
+    v2_after_login_title: "What you get after login",
+    v2_after_login_1: "Track your booking status.",
+    v2_after_login_2: "For suppliers: manage profile + items/services.",
+    v2_after_login_3: "View verification status and booking requests in dashboard.",
+    v2_steps_title: "Step-by-step use case",
+    v2_steps_desc:
+      "With OTP login, separate registration is not required — your account is created automatically on first OTP request.",
+    v2_steps_buyer_title: "Buyer/User",
+    v2_steps_buyer_1: "1) Type your need (or use voice) in the search box on Home.",
+    v2_steps_buyer_2: "2) Review supplier cards in the category-wise list.",
+    v2_steps_buyer_3: "3) Call/WhatsApp to confirm price and delivery.",
+    v2_steps_buyer_4: "4) Log in with OTP (no register needed) to track bookings.",
+    v2_steps_supplier_title: "Supplier",
+    v2_steps_supplier_1: "1) Log in as Supplier using OTP.",
+    v2_steps_supplier_2: "2) Fill Supplier Dashboard profile (business, phone, address).",
+    v2_steps_supplier_3: "3) Add items/services: item name + unit type (per trip/per day/per bag) + price.",
+    v2_steps_supplier_4: "4) After Owner/Admin verification, your listing becomes visible to users.",
+    v2_steps_admin_title: "Owner/Admin",
+    v2_steps_admin_1: "1) OTP login using an allowlisted phone number.",
+    v2_steps_admin_2: "2) Approve/reject pending suppliers in Admin Dashboard.",
+    v2_steps_admin_3: "3) Fraud control: block/unblock, review issues.",
+    v2_steps_admin_4: "4) Manage owner settings (Call/WhatsApp on/off).",
+    v2_tips_title: "Safety tips",
+    v2_tips_1: "Confirm price, delivery time, and total quantity on call.",
+    v2_tips_2: "Never share OTP with anyone.",
+    v2_tips_3: "If there is an issue, use Help: Call/WhatsApp.",
+    v2_admin_prod_title: "Owner/Admin (Production)",
+    v2_admin_prod_desc:
+      "In production, Admin role is only for allowlisted phone numbers. Admin work is operations and safety (not day-to-day buyer/supplier usage).",
+    v2_admin_prod_1: "Supplier verification/review: verify or reject after checking documents.",
+    v2_admin_prod_2: "Block/suspend suspicious suppliers/users.",
+    v2_admin_prod_3: "Control owner settings like enabling/disabling WhatsApp/Call.",
+    v2_admin_prod_note:
+      "Note: In production, keep `OTP_EXPOSE_IN_RESPONSE=0` and configure an OTP delivery provider (SMS/WhatsApp).",
+    v2_home_showcase_title: "How to use",
+    v2_home_step_1: "Choose category",
+    v2_home_step_2: "See supplier cards",
+    v2_home_step_3: "Call/WhatsApp",
     home_logged_in_as: "Logged in user:",
     home_booking_mode: "Booking: Call + WhatsApp",
     home_verified_chip: "Verified local network",
@@ -503,6 +736,13 @@ const uiText = {
     home_support_note: "For local testing, seed demo data first and then use demo phone numbers with OTP login.",
 
     category_all: "All Categories",
+    category_other: "Other",
+    select_category: "Select category",
+    home_contact_hidden: "Hidden",
+    coming_soon_suffix: " (Coming Soon)",
+    coming_soon_badge: "Coming Soon",
+    coming_soon_empty: "No upcoming categories.",
+    coming_soon_desc: "This category will be available soon. Stay connected with GraminHub.",
     home_no_suppliers: "No approved suppliers found in this category yet.",
     home_supplier_verified: "Verified Supplier",
     home_supplier_id_prefix: "ID",
@@ -554,6 +794,14 @@ const uiText = {
     otp_title: "Phone OTP Login (User/Supplier/Admin)",
     otp_desc: "No email needed. Enter phone, get an OTP, and log in.",
     otp_admin_note: "Owner/Admin login works only for allowlisted phone numbers.",
+    v2_login_title: "Login (OTP)",
+    v2_login_subtitle: "Enter your mobile number. You will get an OTP.",
+    v2_login_phone_label: "Mobile number",
+    v2_login_role_question: "Who are you?",
+    v2_login_role_buyer: "Buyer",
+    v2_login_role_supplier: "Supplier",
+    v2_login_role_admin: "Admin",
+    v2_login_otp_label: "OTP",
     otp_phone_placeholder: "Phone number",
     otp_role_user: "Buyer/User",
     otp_role_supplier: "Supplier",
@@ -632,9 +880,21 @@ const uiText = {
     supplier_service_desc: "Add item name/details/variant with up to 3 photos for clear user visibility.",
     supplier_service_category_placeholder: "Category ID (e.g. 2)",
     supplier_service_item_name_placeholder: "Item name (e.g. PPC Cement)",
-    supplier_service_item_variant_placeholder: "Variant/grade (e.g. 50kg bag)",
+    supplier_service_item_variant_placeholder: "Variant/unit (e.g. 50kg bag, per trip, per day)",
     supplier_service_item_details_placeholder: "Item details (optional)",
     supplier_service_price_placeholder: "Price",
+    supplier_service_price_unit_placeholder: "Price unit/type",
+    unit_keep_current: "Unit (keep current)",
+    unit_per_item: "Per item",
+    unit_per_piece: "Per piece",
+    unit_per_packet: "Per packet",
+    unit_per_bag: "Per bag",
+    unit_per_kg: "Per kg",
+    unit_per_ton: "Per ton",
+    unit_per_trip: "Per trip",
+    unit_per_day: "Per day",
+    unit_per_hour: "Per hour",
+    unit_fixed: "Fixed",
     supplier_service_availability_placeholder: "Availability (available/on request)",
     supplier_service_photo_1_placeholder: "Photo URL 1",
     supplier_service_photo_2_placeholder: "Photo URL 2 (optional)",
@@ -690,11 +950,28 @@ const uiText = {
     admin_tab_operations: "Supplier Ops",
     admin_tab_configuration: "Configuration",
     admin_tab_data: "Data & Moderation",
+    admin_contact_controls_title: "Contact controls",
+    admin_contact_controls_desc: "Owner can control Call/WhatsApp buttons, phone visibility, and support contacts here.",
+    admin_setting_show_phone: "Show supplier phone",
+    admin_setting_enable_call: "Enable call button",
+    admin_setting_enable_whatsapp: "Enable WhatsApp button",
+    admin_support_contacts_title: "Public support contacts",
+    admin_support_contacts_desc: "These contacts show on Home/top strip. Set real numbers in production.",
+    admin_support_email_placeholder: "Support email (e.g. support@example.com)",
+    admin_support_phone_placeholder: "Support phone (e.g. +91-9000000000)",
+    admin_support_whatsapp_placeholder: "Support WhatsApp (e.g. +91-9000000000)",
+    admin_settings_load_btn: "Load settings",
+    admin_settings_save_btn: "Save settings",
+    admin_settings_loaded: "Settings loaded.",
+    admin_settings_saved: "Settings saved.",
     admin_data_tab_pending: "Pending Suppliers",
     admin_data_tab_bookings: "All Bookings",
     admin_data_tab_delete: "Delete IDs",
   },
 };
+
+// Backward compatibility: treat the old "hinglish" mode as Hindi.
+uiText.hinglish = uiText.hindi;
 
 const HOME_CATEGORY_COLUMNS = {
   book_vehicle: {
@@ -795,12 +1072,22 @@ function inferHomeBucket(supplier, service) {
 }
 
 function getLangMode() {
-  return localStorage.getItem(UI_LANG_STORAGE_KEY) === "english" ? "english" : "hinglish";
+  const stored = (localStorage.getItem(UI_LANG_STORAGE_KEY) || "").toLowerCase();
+  if (stored === "english") return "english";
+  // Backward compatibility: treat old "hinglish" as Hindi.
+  if (stored === "hinglish") return "hindi";
+  return "hindi";
 }
 
 function t(key) {
   const mode = getLangMode();
-  return uiText[mode][key] ?? uiText.hinglish[key] ?? key;
+  const primary = uiText[mode] || {};
+  if (primary[key] !== undefined) return primary[key];
+  const hindi = uiText.hindi || {};
+  if (hindi[key] !== undefined) return hindi[key];
+  const english = uiText.english || {};
+  if (english[key] !== undefined) return english[key];
+  return key;
 }
 
 function roleLabel(role) {
@@ -812,7 +1099,7 @@ function roleLabel(role) {
 }
 
 function setLanguageButtonState(mode) {
-  const defaultBtn = document.getElementById("langHinglish");
+  const defaultBtn = document.getElementById("langHindi");
   const englishBtn = document.getElementById("langEnglish");
   if (!defaultBtn || !englishBtn) return;
 
@@ -826,7 +1113,7 @@ function setLanguageButtonState(mode) {
 }
 
 function applyLanguage(mode) {
-  const normalized = mode === "english" ? "english" : "hinglish";
+  const normalized = mode === "english" ? "english" : "hindi";
   const texts = uiText[normalized];
   if (!texts) return;
 
@@ -894,14 +1181,14 @@ function applyLanguage(mode) {
 }
 
 function initLanguageToggle() {
-  const defaultBtn = document.getElementById("langHinglish");
+  const defaultBtn = document.getElementById("langHindi");
   const englishBtn = document.getElementById("langEnglish");
   if (!defaultBtn || !englishBtn) return;
 
   const savedMode = getLangMode();
   applyLanguage(savedMode);
 
-  defaultBtn.addEventListener("click", () => applyLanguage("hinglish"));
+  defaultBtn.addEventListener("click", () => applyLanguage("hindi"));
   englishBtn.addEventListener("click", () => applyLanguage("english"));
 }
 
@@ -958,6 +1245,77 @@ function setGlobalSearchStatus(message = "") {
   if (!statusEl) return;
   statusEl.textContent = message;
   statusEl.classList.toggle("hidden", !message);
+}
+
+let lastAiSuggestedQuery = "";
+
+function closeAiPanel() {
+  const panel = document.getElementById("aiSearchPanel");
+  if (panel) panel.classList.add("hidden");
+}
+
+function applyAiSuggestion() {
+  const query = (lastAiSuggestedQuery || "").trim();
+  if (!query) return;
+  const globalInput = document.getElementById("globalSearchInput");
+  if (globalInput) globalInput.value = query;
+  const applyBtn = document.getElementById("aiApplySuggestedBtn");
+  if (applyBtn) applyBtn.classList.add("hidden");
+  showToast({
+    title: "GraminHub",
+    message: formatMessage(t("ai_search_applied_toast"), { query }),
+    variant: "info",
+  });
+  runGlobalSearch();
+}
+
+async function runAiSearch() {
+  const globalInput = document.getElementById("globalSearchInput");
+  const query = globalInput?.value?.trim() || "";
+  if (!query) {
+    setGlobalSearchStatus(t("ai_search_empty"));
+    return;
+  }
+
+  const panel = document.getElementById("aiSearchPanel");
+  const answerEl = document.getElementById("aiSearchAnswer");
+  const applyBtn = document.getElementById("aiApplySuggestedBtn");
+  if (panel) panel.classList.remove("hidden");
+  if (answerEl) answerEl.textContent = t("ai_search_running");
+  if (applyBtn) applyBtn.classList.add("hidden");
+  lastAiSuggestedQuery = "";
+
+  try {
+    const res = await fetch("/api/v2/ai/search", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-UI-Lang": getLangMode(),
+      },
+      body: JSON.stringify({ query, language: getLangMode() }),
+    });
+
+    if (res.status === 404) {
+      if (answerEl) answerEl.textContent = t("ai_search_disabled");
+      return;
+    }
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      if (answerEl) answerEl.textContent = data?.detail || t("ai_search_error");
+      return;
+    }
+
+    const answer = (data?.answer || "").trim();
+    const suggested = (data?.suggested_query || "").trim();
+    if (answerEl) answerEl.textContent = answer || t("ai_search_error");
+    if (suggested && suggested.toLowerCase() !== query.toLowerCase()) {
+      lastAiSuggestedQuery = suggested;
+      if (applyBtn) applyBtn.classList.remove("hidden");
+    }
+  } catch {
+    if (answerEl) answerEl.textContent = t("ai_search_error");
+  }
 }
 
 function runGlobalSearch() {
@@ -1516,10 +1874,16 @@ async function loadCategories() {
     categoryNameById[category.id] = category.name;
     categoryList.push(category);
   });
+  window.categoryList = categoryList;
 
   populateCategorySelect("categorySelect", { includeAllOption: true, includeDisabled: true });
-  populateCategorySelect("svcCategoryId", { enabledOnly: true, placeholder: "Select category" });
-  populateCategorySelect("editSvcCategoryId", { enabledOnly: true, placeholder: "Select category" });
+  populateCategorySelect("svcCategoryId", { enabledOnly: true, placeholder: t("select_category") });
+  populateCategorySelect("editSvcCategoryId", { enabledOnly: true, placeholder: t("select_category") });
+  populatePriceUnitSelect("svcPriceUnitType", {
+    placeholderKey: "supplier_service_price_unit_placeholder",
+    defaultValue: "per_item",
+  });
+  populatePriceUnitSelect("editSvcPriceUnitType", { placeholderKey: "unit_keep_current" });
   renderComingSoonCategories();
 }
 
@@ -1550,7 +1914,7 @@ function populateCategorySelect(
   if (!enabledOnly && includeDisabled) {
     disabled.forEach((category) => {
       options.push(
-        `<option value="${category.id}" disabled>${escapeHtml(category.name)} (Coming Soon)</option>`,
+        `<option value="${category.id}" disabled>${escapeHtml(category.name)}${escapeHtml(t("coming_soon_suffix"))}</option>`,
       );
     });
   }
@@ -1561,12 +1925,39 @@ function populateCategorySelect(
   }
 }
 
+function populatePriceUnitSelect(selectId, { placeholderKey = "", defaultValue = "" } = {}) {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+  const previousSelection = select.value;
+
+  const options = [];
+  if (placeholderKey) {
+    options.push(`<option value="">${escapeHtml(t(placeholderKey))}</option>`);
+  }
+
+  PRICE_UNIT_OPTIONS.forEach((value) => {
+    const labelKey = value === "fixed" ? "unit_fixed" : `unit_${value}`;
+    options.push(`<option value="${escapeHtml(value)}">${escapeHtml(t(labelKey))}</option>`);
+  });
+
+  select.innerHTML = options.join("");
+  if (previousSelection) {
+    select.value = previousSelection;
+    return;
+  }
+  if (defaultValue) {
+    select.value = defaultValue;
+  }
+}
+
 function renderComingSoonCategories() {
   const wrap = document.getElementById("comingSoonCategories");
   if (!wrap) return;
   const disabled = categoryList.filter((category) => category?.is_enabled === false);
   if (!disabled.length) {
-    wrap.innerHTML = `<div class="rounded-xl border border-dashed border-slate-300 bg-white/80 p-3 text-sm text-slate-600">No upcoming categories.</div>`;
+    wrap.innerHTML = `<div class="rounded-xl border border-dashed border-slate-300 bg-white/80 p-3 text-sm text-slate-600">${escapeHtml(
+      t("coming_soon_empty"),
+    )}</div>`;
     return;
   }
 
@@ -1575,11 +1966,11 @@ function renderComingSoonCategories() {
       const icon = CATEGORY_UI_CONFIG[category.key]?.icon || "fa-regular fa-clock";
       return `
         <article class="gh-coming-soon-card">
-          <p class="gh-badge-soon"><i class="fa-regular fa-clock"></i> Coming Soon</p>
+          <p class="gh-badge-soon"><i class="fa-regular fa-clock"></i> ${escapeHtml(t("coming_soon_badge"))}</p>
           <h3 class="mt-2 font-display text-lg font-bold text-slate-900">
             <i class="${escapeHtml(icon)} mr-2 text-brand-700"></i>${escapeHtml(category.name)}
           </h3>
-          <p class="mt-1 text-sm text-slate-600">This category will be available soon. Stay connected with GraminHub.</p>
+          <p class="mt-1 text-sm text-slate-600">${escapeHtml(t("coming_soon_desc"))}</p>
         </article>
       `;
     })
@@ -1601,6 +1992,16 @@ function scrollPhotoStrip(stripId, direction) {
 
 function normalizedItemName(service) {
   return String(service?.item_name || "").trim();
+}
+
+function priceUnitLabel(unitType) {
+  const normalized = String(unitType || "per_item")
+    .trim()
+    .toLowerCase()
+    .replace(/-/g, "_");
+  const key = normalized === "fixed" ? "unit_fixed" : `unit_${normalized}`;
+  const label = t(key);
+  return label && label !== key ? label : "";
 }
 
 function supplierItemCardMarkup(supplier, service) {
@@ -1646,9 +2047,9 @@ function supplierItemCardMarkup(supplier, service) {
       }
       ${
         service.price
-          ? `<p class="mt-1 text-xs font-semibold text-emerald-700">${escapeHtml(t("home_item_price_label"))} ${escapeHtml(
-              String(service.price),
-            )}</p>`
+          ? `<p class="mt-1 text-xs font-semibold text-emerald-700">${escapeHtml(
+              t("home_item_price_label"),
+            )} ₹${escapeHtml(String(service.price))}${priceUnitLabel(service.price_unit_type) ? ` / ${escapeHtml(priceUnitLabel(service.price_unit_type))}` : ""}</p>`
           : ""
       }
       <p class="mt-1 text-xs text-slate-600">${escapeHtml(t("home_item_availability_label"))} ${escapeHtml(
@@ -1671,7 +2072,9 @@ function supplierItemCardMarkup(supplier, service) {
             ? `<p class="mt-1 text-sm font-semibold text-slate-800">${escapeHtml(
                 t("home_contact_number"),
               )} <span class="text-slate-900">${escapeHtml(supplier.phone)}</span></p>`
-            : `<p class="mt-1 text-sm font-semibold text-slate-500">${escapeHtml(t("home_contact_number"))} Hidden</p>`
+            : `<p class="mt-1 text-sm font-semibold text-slate-500">${escapeHtml(
+                t("home_contact_number"),
+              )} ${escapeHtml(t("home_contact_hidden"))}</p>`
         }
         <p class="mt-1 text-sm text-amber-700">
           ${escapeHtml(t("home_rating_label"))} ${ratingStars(supplier.average_rating)} (${Number(
@@ -1715,6 +2118,16 @@ function renderSuppliers(suppliers, options = {}) {
   if (!wrap) return;
   const emptyMessage = options.emptyMessage || t("home_no_suppliers");
 
+  const uiMode = document.body?.dataset?.uiMode || "v1";
+  if (uiMode === "v2") {
+    const urlParams = new URLSearchParams(window.location.search);
+    const showAll = urlParams.get("all") === "1";
+    const hasQuery = Boolean((urlParams.get("keyword") || urlParams.get("q") || "").trim());
+    const limitPerCategory = showAll || hasQuery ? null : 3;
+    renderSuppliersCategoryWise(wrap, suppliers, { emptyMessage, limitPerCategory });
+    return;
+  }
+
   const itemCards = [];
   suppliers.forEach((supplier) => {
     const services = (Array.isArray(supplier.services) ? supplier.services : []).filter((service) =>
@@ -1733,16 +2146,92 @@ function renderSuppliers(suppliers, options = {}) {
   wrap.innerHTML = itemCards.join("");
 }
 
+function renderSuppliersCategoryWise(wrap, suppliers, { emptyMessage, limitPerCategory = null }) {
+  const items = [];
+  suppliers.forEach((supplier) => {
+    const services = (Array.isArray(supplier.services) ? supplier.services : []).filter((service) =>
+      Boolean(normalizedItemName(service)),
+    );
+    services.forEach((service) => {
+      items.push({ supplier, service, categoryId: service?.category_id ?? null });
+    });
+  });
+
+  if (!items.length) {
+    wrap.innerHTML = `<div class="rounded-2xl border border-slate-200 bg-white p-5 text-slate-600 shadow-sm">${escapeHtml(
+      emptyMessage,
+    )}</div>`;
+    return;
+  }
+
+  const groups = new Map();
+  items.forEach((item) => {
+    const key = item.categoryId === null || item.categoryId === undefined ? "other" : String(item.categoryId);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(item);
+  });
+
+  const orderedKeys = [];
+  const enabledCategories = categoryList.filter((c) => Boolean(c?.is_enabled));
+  enabledCategories.forEach((c) => {
+    const key = String(c.id);
+    if (groups.has(key)) orderedKeys.push(key);
+  });
+  if (groups.has("other")) orderedKeys.push("other");
+
+  // Any remaining keys (disabled categories that still have items).
+  Array.from(groups.keys())
+    .filter((key) => !orderedKeys.includes(key))
+    .forEach((key) => orderedKeys.push(key));
+
+  const sections = orderedKeys.map((key) => {
+    const list = groups.get(key) || [];
+    if (!list.length) return "";
+
+    const categoryName = key === "other" ? t("category_other") : (categoryNameById[Number(key)] || t("home_category_label"));
+
+    const ordered = list
+      .sort((a, b) => Number(b.service?.id || 0) - Number(a.service?.id || 0))
+    const limited = typeof limitPerCategory === "number" ? ordered.slice(0, limitPerCategory) : ordered;
+
+    const cards = limited
+      .map((item) => supplierItemCardMarkup(item.supplier, item.service))
+      .join("");
+
+    const suffix =
+      typeof limitPerCategory === "number" && ordered.length > limited.length
+        ? `<p class="mt-2 text-xs font-semibold text-slate-600">${escapeHtml(
+            formatMessage(t("v2_home_more_items_hint"), { count: ordered.length - limited.length }),
+          )}</p>`
+        : "";
+
+    return `
+      <section class="mb-5">
+        <div class="mb-2 flex items-end justify-between gap-2">
+          <h3 class="font-display text-lg font-extrabold text-slate-900">${escapeHtml(categoryName)}</h3>
+          <p class="text-xs font-semibold text-slate-600">${escapeHtml(String(list.length))}</p>
+        </div>
+        <div class="grid gap-4">${cards}</div>
+        ${suffix}
+      </section>
+    `;
+  });
+
+  wrap.innerHTML = sections.join("");
+}
+
 function homeCategoryItemCardMarkup(supplier, service) {
   const firstPhoto = itemPhotoUrls(service)[0];
-  return `<article class="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
-      ${
-        firstPhoto
-          ? `<a href="${escapeHtml(firstPhoto)}" target="_blank" rel="noopener noreferrer">
-        <img src="${escapeHtml(firstPhoto)}" alt="Item photo" class="h-28 w-full rounded-lg border border-slate-200 object-cover" loading="lazy" />
+  const photoBlock = firstPhoto
+    ? `<a href="${escapeHtml(firstPhoto)}" target="_blank" rel="noopener noreferrer">
+        <img src="${escapeHtml(firstPhoto)}" alt="Item photo" class="h-full w-full object-cover" loading="lazy" />
       </a>`
-          : ""
-      }
+    : `<div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 text-xs font-semibold text-slate-500">
+        <i class="fa-regular fa-image mr-2"></i>${escapeHtml(t("home_item_photos_label"))}
+      </div>`;
+
+  return `<article class="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div class="h-28 w-full overflow-hidden rounded-xl border border-slate-200 bg-white">${photoBlock}</div>
       <h4 class="mt-2 font-display text-base font-bold text-slate-900">${escapeHtml(normalizedItemName(service))}</h4>
       ${
         service.item_variant
@@ -1756,10 +2245,19 @@ function homeCategoryItemCardMarkup(supplier, service) {
           ? `<p class="mt-1 text-xs text-slate-600">${escapeHtml(service.item_details)}</p>`
           : ""
       }
+      ${
+        service.price
+          ? `<p class="mt-1 text-xs font-semibold text-emerald-700">₹${escapeHtml(
+              String(service.price),
+            )}${priceUnitLabel(service.price_unit_type) ? ` / ${escapeHtml(priceUnitLabel(service.price_unit_type))}` : ""}</p>`
+          : ""
+      }
       <p class="mt-1 text-xs font-semibold text-slate-800">${escapeHtml(supplier.business_name)}${
         siteSettings.show_supplier_phone && supplier.phone ? ` | ${escapeHtml(supplier.phone)}` : ""
       }</p>
-      <div class="mt-2 flex flex-wrap gap-2">
+
+      <div class="mt-auto pt-3">
+        <div class="flex flex-wrap gap-2">
         ${
           siteSettings.enable_supplier_call
             ? `<button onclick="callSupplier(${supplier.id})" class="rounded-lg bg-blue-600 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700">${escapeHtml(
@@ -1777,6 +2275,7 @@ function homeCategoryItemCardMarkup(supplier, service) {
         <button onclick="rateSupplier(${supplier.id})" class="rounded-lg bg-amber-500 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-amber-600">${escapeHtml(
           t("home_rate_btn"),
         )}</button>
+        </div>
       </div>
     </article>`;
 }
@@ -1785,6 +2284,31 @@ async function loadSiteSettingsPublic() {
   const out = await requestJSON("/api/public/site-settings");
   if (out.status !== 200 || !out.data) return;
   siteSettings = { ...siteSettings, ...out.data };
+  applyPublicSupportContacts(out.data);
+}
+
+function applyPublicSupportContacts(data) {
+  const email = String(data?.public_support_email || "").trim();
+  const phone = String(data?.public_support_phone || "").trim();
+  const whatsapp = String(data?.public_support_whatsapp || "").trim();
+
+  const emailValue = document.getElementById("publicSupportEmailValue");
+  const phoneValue = document.getElementById("publicSupportPhoneValue");
+  const emailLink = document.getElementById("publicSupportEmailLink");
+  const phoneLink = document.getElementById("publicSupportPhoneLink");
+  if (emailValue && email) emailValue.textContent = email;
+  if (phoneValue && phone) phoneValue.textContent = phone;
+  if (emailLink && email) emailLink.setAttribute("href", `mailto:${email}`);
+  if (phoneLink && phone) phoneLink.setAttribute("href", `tel:${phone}`);
+
+  const helpCallLink = document.getElementById("helpCallLink");
+  if (helpCallLink && phone) helpCallLink.setAttribute("href", `tel:${phone}`);
+
+  const helpWhatsappLink = document.getElementById("helpWhatsappLink");
+  if (helpWhatsappLink && whatsapp) {
+    const digits = whatsapp.replace(/[^\d]/g, "");
+    if (digits) helpWhatsappLink.setAttribute("href", `https://wa.me/${digits}`);
+  }
 }
 
 async function loadSiteSettingsForAdmin() {
@@ -1795,10 +2319,16 @@ async function loadSiteSettingsForAdmin() {
     const showPhone = document.getElementById("settingShowPhone");
     const enableCall = document.getElementById("settingEnableCall");
     const enableWhatsapp = document.getElementById("settingEnableWhatsapp");
+    const supportEmail = document.getElementById("settingSupportEmail");
+    const supportPhone = document.getElementById("settingSupportPhone");
+    const supportWhatsapp = document.getElementById("settingSupportWhatsapp");
     if (showPhone) showPhone.checked = Boolean(out.data.show_supplier_phone);
     if (enableCall) enableCall.checked = Boolean(out.data.enable_supplier_call);
     if (enableWhatsapp) enableWhatsapp.checked = Boolean(out.data.enable_supplier_whatsapp);
-    setText("adminOutput", "Settings loaded.");
+    if (supportEmail) supportEmail.value = out.data.public_support_email || "";
+    if (supportPhone) supportPhone.value = out.data.public_support_phone || "";
+    if (supportWhatsapp) supportWhatsapp.value = out.data.public_support_whatsapp || "";
+    setText("adminOutput", t("admin_settings_loaded"));
   } else {
     setJSON("adminOutput", out);
   }
@@ -1809,15 +2339,21 @@ async function saveSiteSettingsForAdmin() {
   const showPhone = document.getElementById("settingShowPhone")?.checked ?? true;
   const enableCall = document.getElementById("settingEnableCall")?.checked ?? true;
   const enableWhatsapp = document.getElementById("settingEnableWhatsapp")?.checked ?? true;
+  const supportEmail = document.getElementById("settingSupportEmail")?.value?.trim() || "";
+  const supportPhone = document.getElementById("settingSupportPhone")?.value?.trim() || "";
+  const supportWhatsapp = document.getElementById("settingSupportWhatsapp")?.value?.trim() || "";
   const payload = {
     show_supplier_phone: showPhone,
     enable_supplier_call: enableCall,
     enable_supplier_whatsapp: enableWhatsapp,
+    public_support_email: supportEmail,
+    public_support_phone: supportPhone,
+    public_support_whatsapp: supportWhatsapp,
   };
   const out = await requestJSON("/api/admin/site-settings", { method: "PUT", body: JSON.stringify(payload) });
   if (handleUnauthorizedResult(out, "adminOutput")) return;
   if (out.status === 200) {
-    setText("adminOutput", "Settings saved.");
+    setText("adminOutput", t("admin_settings_saved"));
     await loadSiteSettingsPublic();
   } else {
     setJSON("adminOutput", out);
@@ -2267,6 +2803,7 @@ async function addSupplierService() {
   const itemName = document.getElementById("svcItemName")?.value.trim() || "";
   const itemDetails = document.getElementById("svcItemDetails")?.value.trim() || "";
   const itemVariant = document.getElementById("svcItemVariant")?.value.trim() || "";
+  const priceUnitType = document.getElementById("svcPriceUnitType")?.value?.trim() || "per_item";
   const categoryRaw = document.getElementById("svcCategoryId")?.value.trim() || "";
   const priceRaw = document.getElementById("svcPrice")?.value.trim() || "";
   const availability = document.getElementById("svcAvailability")?.value.trim() || "available";
@@ -2283,6 +2820,7 @@ async function addSupplierService() {
     item_name: itemName,
     item_details: itemDetails || null,
     item_variant: itemVariant || null,
+    price_unit_type: priceUnitType,
     availability,
     photo_url_1: photo1 || null,
     photo_url_2: photo2 || null,
@@ -2385,6 +2923,7 @@ async function updateSupplierServiceById() {
   const itemName = document.getElementById("editSvcItemName")?.value.trim() || "";
   const itemDetails = document.getElementById("editSvcItemDetails")?.value.trim() || "";
   const itemVariant = document.getElementById("editSvcItemVariant")?.value.trim() || "";
+  const priceUnitType = document.getElementById("editSvcPriceUnitType")?.value.trim() || "";
   const priceRaw = document.getElementById("editSvcPrice")?.value.trim() || "";
   const availability = document.getElementById("editSvcAvailability")?.value.trim() || "";
   const photo1 = document.getElementById("editSvcPhoto1")?.value.trim() || "";
@@ -2416,6 +2955,7 @@ async function updateSupplierServiceById() {
   if (itemName) payload.item_name = itemName;
   if (itemDetails) payload.item_details = itemDetails;
   if (itemVariant) payload.item_variant = itemVariant;
+  if (priceUnitType) payload.price_unit_type = priceUnitType;
   if (availability) payload.availability = availability;
   if (photo1) payload.photo_url_1 = photo1;
   if (photo2) payload.photo_url_2 = photo2;
@@ -2675,8 +3215,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadHomeCategoryItems();
 
   if (document.getElementById("supplierCards")) {
+    const uiMode = document.body?.dataset?.uiMode || "v1";
     if (prefillKeyword) {
       await searchSuppliers("keyword", { silent: true });
+      return;
+    }
+    if (uiMode === "v2") {
+      await searchSuppliers("advanced", { silent: true });
       return;
     }
     renderHomeSearchPrompt();

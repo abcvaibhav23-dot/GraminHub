@@ -15,6 +15,32 @@ from app.schemas.supplier_schema import SupplierCreate, SupplierServiceCreate, S
 
 logger = logging.getLogger(__name__)
 
+ALLOWED_PRICE_UNIT_TYPES: set[str] = {
+    "per_item",
+    "per_piece",
+    "per_packet",
+    "per_bag",
+    "per_kg",
+    "per_ton",
+    "per_trip",
+    "per_day",
+    "per_hour",
+    "fixed",
+}
+
+
+def _normalized_unit_type(value: str | None) -> str:
+    normalized = " ".join((value or "").strip().lower().split())
+    normalized = normalized.replace("-", "_")
+    return normalized or "per_item"
+
+
+def _validate_unit_type(value: str | None) -> str:
+    normalized = _normalized_unit_type(value)
+    if normalized not in ALLOWED_PRICE_UNIT_TYPES:
+        raise ValidationError("Invalid price unit type")
+    return normalized
+
 
 def _normalized_optional_text(value: str | None) -> str | None:
     if value is None:
@@ -176,6 +202,7 @@ def add_supplier_service(db: Session, user: User, payload: SupplierServiceCreate
         photo_url_2=_normalized_optional_text(payload.photo_url_2),
         photo_url_3=_normalized_optional_text(payload.photo_url_3),
         price=payload.price,
+        price_unit_type=_validate_unit_type(payload.price_unit_type),
         availability=_normalized_optional_text(payload.availability) or "available",
     )
     db.add(service)
@@ -247,6 +274,9 @@ def update_supplier_service(
 
     if payload.price is not None:
         service.price = payload.price
+
+    if payload.price_unit_type is not None:
+        service.price_unit_type = _validate_unit_type(payload.price_unit_type)
 
     if payload.availability is not None:
         service.availability = _normalized_optional_text(payload.availability) or "available"

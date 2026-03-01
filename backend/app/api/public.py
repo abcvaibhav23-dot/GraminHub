@@ -20,5 +20,7 @@ def get_public_site_settings(db: Session = Depends(get_db)) -> SiteSettingsOut:
         show_supplier_phone=data["show_supplier_phone"],
         enable_supplier_call=data["enable_supplier_call"],
         enable_supplier_whatsapp=data["enable_supplier_whatsapp"],
+        public_support_email=str(data.get("public_support_email") or ""),
+        public_support_phone=str(data.get("public_support_phone") or ""),
+        public_support_whatsapp=str(data.get("public_support_whatsapp") or ""),
     )
-

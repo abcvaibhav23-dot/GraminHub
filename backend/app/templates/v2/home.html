@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+{% block title %}Home | GraminHub{% endblock %}
+{% block meta_description %}GraminHub पर गांव-कस्बों के लिए आसान सप्लायर खोज और बुकिंग।{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-7xl">
+  <div class="relative overflow-hidden rounded-3xl border border-white/30 bg-gradient-to-br from-brand-700 via-emerald-700 to-slate-900 p-6 text-white shadow-2xl sm:p-10">
+    <div class="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-white/10 blur-2xl"></div>
+    <div class="absolute -right-24 -bottom-24 h-72 w-72 rounded-full bg-white/10 blur-2xl"></div>
+    <div class="relative">
+      <h1 data-ui-i18n="v2_home_title" class="font-display text-3xl font-extrabold leading-tight sm:text-5xl">क्या चाहिए?</h1>
+      <p data-ui-i18n="v2_home_subtitle" class="mt-3 max-w-3xl text-base text-white/90 sm:text-lg">श्रेणी चुनें या बस नाम लिखें। फिर Call/WhatsApp से तुरंत बात करें।</p>
+
+      <div class="mt-5 grid gap-3 md:grid-cols-2">
+        <button type="button" onclick="quickSearch('cement')" class="rounded-2xl bg-white/15 px-5 py-4 text-left backdrop-blur transition hover:bg-white/20">
+          <div data-ui-i18n="v2_home_category_label" class="text-sm font-semibold uppercase tracking-[0.14em] text-white/90">Category</div>
+          <div data-ui-i18n="v2_home_cat_materials_title" class="mt-1 text-xl font-extrabold">Building Materials</div>
+          <div data-ui-i18n="v2_home_cat_materials_desc" class="mt-1 text-sm text-white/90">सीमेंट • बालू • गिट्टी • स्टील</div>
+        </button>
+        <button type="button" onclick="quickSearch('truck')" class="rounded-2xl bg-white/15 px-5 py-4 text-left backdrop-blur transition hover:bg-white/20">
+          <div data-ui-i18n="v2_home_category_label" class="text-sm font-semibold uppercase tracking-[0.14em] text-white/90">Category</div>
+          <div data-ui-i18n="v2_home_cat_vehicle_title" class="mt-1 text-xl font-extrabold">Vehicle Booking</div>
+          <div data-ui-i18n="v2_home_cat_vehicle_desc" class="mt-1 text-sm text-white/90">ट्रक • ट्रैक्टर • ट्रॉली</div>
+        </button>
+      </div>
+
+      <div class="mt-6 rounded-2xl border border-white/25 bg-white/10 p-4 backdrop-blur">
+        <label data-ui-i18n="v2_home_need_label" class="block text-sm font-semibold text-white/95" for="globalSearchInput">अपनी जरूरत लिखें</label>
+        <div class="mt-2 grid gap-2 sm:grid-cols-[1fr_auto_auto_auto]">
+          <input
+            id="globalSearchInput"
+            class="gh-input w-full rounded-xl px-3 py-3 text-base text-slate-900"
+            data-ui-placeholder="v2_home_need_placeholder"
+            placeholder="उदाहरण: 50 cement bags, sonbhadra"
+          />
+          <button id="globalSearchBtn" onclick="runGlobalSearch()" class="rounded-xl bg-white px-5 py-3 text-base font-semibold text-slate-900 transition hover:bg-white/90">
+            <span data-ui-i18n="v2_home_search_btn">Search</span>
+          </button>
+          <button id="globalVoiceBtn" onclick="startGlobalVoiceSearch()" class="rounded-xl border border-white/40 bg-white/10 px-4 py-3 text-base font-semibold text-white transition hover:bg-white/15">
+            <span data-ui-i18n="global_voice_btn">Voice</span>
+          </button>
+          <button id="aiSearchBtn" onclick="runAiSearch()" class="rounded-xl border border-white/40 bg-white/10 px-4 py-3 text-base font-semibold text-white transition hover:bg-white/15">
+            <span data-ui-i18n="v2_home_ai_btn">AI</span>
+          </button>
+        </div>
+        <p id="globalSearchStatus" class="mt-2 hidden text-xs font-semibold text-white/85" aria-live="polite"></p>
+        <div id="aiSearchPanel" class="mt-3 hidden rounded-2xl border border-white/25 bg-white/10 p-4 text-white/95 backdrop-blur" aria-live="polite">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <p data-ui-i18n="ai_search_title" class="text-sm font-extrabold">AI Answer</p>
+            <button type="button" onclick="closeAiPanel()" class="rounded-xl border border-white/30 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/15">
+              <span data-ui-i18n="ai_search_close_btn">Close</span>
+            </button>
+          </div>
+          <p id="aiSearchAnswer" class="mt-2 text-sm"></p>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <button id="aiApplySuggestedBtn" type="button" onclick="applyAiSuggestion()" class="hidden rounded-xl bg-white px-4 py-2 text-xs font-semibold text-slate-900 hover:bg-white/90">
+              <span data-ui-i18n="ai_search_apply_btn">Use suggested search</span>
+            </button>
+          </div>
+          <p data-ui-i18n="ai_search_note" class="mt-3 text-xs text-white/80">
+            Privacy: your query is sent to our AI provider to generate an answer.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-5 flex flex-wrap gap-3">
+        <a href="/login" data-ui-i18n="nav_login" class="rounded-xl bg-blue-500 px-5 py-3 text-base font-semibold text-white transition hover:bg-blue-600">Login</a>
+        <a href="/register" data-ui-i18n="nav_register" class="rounded-xl bg-white/15 px-5 py-3 text-base font-semibold text-white backdrop-blur transition hover:bg-white/20">Register</a>
+        <a id="helpCallLink" href="tel:{{ public_support_phone }}" data-ui-i18n="v2_home_help_call" class="rounded-xl bg-white/15 px-5 py-3 text-base font-semibold text-white backdrop-blur transition hover:bg-white/20">Help: Call</a>
+        <a id="helpWhatsappLink" href="https://wa.me/{{ public_support_whatsapp | replace('+', '') | replace('-', '') | replace(' ', '') }}" target="_blank" rel="noopener noreferrer" data-ui-i18n="v2_home_help_whatsapp" class="rounded-xl bg-white/15 px-5 py-3 text-base font-semibold text-white backdrop-blur transition hover:bg-white/20">Help: WhatsApp</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="homeCategoryColumns" class="mt-6">
+    <h2 data-ui-i18n="v2_home_available_title" class="font-display text-xl font-extrabold text-slate-900">अभी उपलब्ध</h2>
+    <p data-ui-i18n="v2_home_available_desc" class="mt-1 text-sm text-slate-600">यहां हर श्रेणी के 2–3 top items दिखते हैं। Search करने पर सभी results दिखेंगे।</p>
+
+    <div class="mt-4 grid gap-4 lg:grid-cols-3">
+      <article class="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h3 data-ui-i18n="v2_col_vehicle_title" class="font-display text-lg font-extrabold text-slate-900">Vehicle</h3>
+            <p data-ui-i18n="v2_col_vehicle_desc" class="mt-1 text-sm text-slate-600">ट्रक, ट्रैक्टर, JCB...</p>
+          </div>
+          <select id="homeFilterBookVehicle" class="gh-input rounded-xl px-3 py-2 text-sm"></select>
+        </div>
+        <div id="homeItemsBookVehicle" class="mt-4 grid gap-3 sm:grid-cols-2"></div>
+      </article>
+
+      <article class="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h3 data-ui-i18n="v2_col_materials_title" class="font-display text-lg font-extrabold text-slate-900">Building Materials</h3>
+            <p data-ui-i18n="v2_col_materials_desc" class="mt-1 text-sm text-slate-600">सीमेंट, बालू, गिट्टी...</p>
+          </div>
+          <select id="homeFilterMaterials" class="gh-input rounded-xl px-3 py-2 text-sm"></select>
+        </div>
+        <div id="homeItemsMaterials" class="mt-4 grid gap-3 sm:grid-cols-2"></div>
+      </article>
+
+      <article class="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm">
+        <div>
+          <h3 data-ui-i18n="v2_col_soon_title" class="font-display text-lg font-extrabold text-slate-900">Coming Soon</h3>
+          <p data-ui-i18n="v2_col_soon_desc" class="mt-1 text-sm text-slate-600">अगली श्रेणियां जल्द आएंगी।</p>
+        </div>
+        <div id="comingSoonCategories" class="mt-4 grid gap-3"></div>
+      </article>
+    </div>
+  </div>
+
+  <section id="searchResults" class="mt-6 hidden rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-sm sm:p-8" aria-live="polite">
+    <div class="flex flex-wrap items-end justify-between gap-3">
+      <div>
+        <h2 data-ui-i18n="v2_results_title" class="font-display text-xl font-extrabold text-slate-900">Search Results</h2>
+        <p data-ui-i18n="v2_results_desc" class="mt-1 text-sm text-slate-600">ऊपर search करने पर सभी matching items यहां दिखेंगे।</p>
+      </div>
+      <a href="/" data-ui-i18n="v2_results_clear" class="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-50">Clear</a>
+    </div>
+    <div id="supplierCards" class="mt-4"></div>
+  </section>
+
+  <div class="mt-6 rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-sm sm:p-8">
+    <h2 data-ui-i18n="v2_about_title" class="font-display text-xl font-extrabold text-slate-900">GraminHub क्या है?</h2>
+    <p data-ui-i18n="v2_about_desc" class="mt-2 text-sm text-slate-700">GraminHub गांव-कस्बों के लिए सप्लायर और वाहन सेवाओं का आसान प्लेटफॉर्म है। आप जरूरत लिखें, सप्लायर देखें, और Call/WhatsApp से तुरंत संपर्क करें।</p>
+
+    <div class="mt-4 grid gap-3 sm:grid-cols-3">
+      <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <p data-ui-i18n="v2_about_point_1" class="text-sm font-semibold text-slate-900">बड़े बटन, आसान स्क्रीन</p>
+      </div>
+      <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <p data-ui-i18n="v2_about_point_2" class="text-sm font-semibold text-slate-900">सीधा Call/WhatsApp</p>
+      </div>
+      <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <p data-ui-i18n="v2_about_point_3" class="text-sm font-semibold text-slate-900">बुकिंग स्टेटस ट्रैकिंग</p>
+      </div>
+    </div>
+
+    <div class="mt-6 grid gap-4 md:grid-cols-2">
+      <article class="rounded-2xl border border-slate-200 bg-white p-5">
+        <h3 data-ui-i18n="v2_buyer_title" class="font-display text-lg font-extrabold text-slate-900">Buyer/User कैसे इस्तेमाल करे?</h3>
+        <ol class="mt-3 space-y-2 text-sm text-slate-700">
+          <li data-ui-i18n="v2_buyer_step_1">1) Search box में अपनी जरूरत लिखें (जैसे: सीमेंट, ट्रक, ट्रैक्टर)।</li>
+          <li data-ui-i18n="v2_buyer_step_2">2) नीचे category-wise items में से सप्लायर चुनें।</li>
+          <li data-ui-i18n="v2_buyer_step_3">3) “Call” या “WhatsApp” दबाकर सीधे बात करें।</li>
+          <li data-ui-i18n="v2_buyer_step_4">4) बुकिंग ट्रैक करने के लिए OTP से लॉगिन करें।</li>
+        </ol>
+        <p data-ui-i18n="v2_buyer_tip" class="mt-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700">Tip: अपनी जगह (गांव/शहर) और मात्रा जरूर लिखें।</p>
+      </article>
+
+      <article class="rounded-2xl border border-slate-200 bg-white p-5">
+        <h3 data-ui-i18n="v2_supplier_title" class="font-display text-lg font-extrabold text-slate-900">Supplier कैसे इस्तेमाल करे?</h3>
+        <ol class="mt-3 space-y-2 text-sm text-slate-700">
+          <li data-ui-i18n="v2_supplier_step_1">1) OTP से Supplier के रूप में लॉगिन करें।</li>
+          <li data-ui-i18n="v2_supplier_step_2">2) प्रोफाइल बनाएं (नाम, फोन, पता)।</li>
+          <li data-ui-i18n="v2_supplier_step_3">3) अपनी items/services और price जोड़ें।</li>
+          <li data-ui-i18n="v2_supplier_step_4">4) Owner/Admin verification के बाद आपकी लिस्टिंग live होगी।</li>
+        </ol>
+        <p data-ui-i18n="v2_supplier_tip" class="mt-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700">Tip: सही फोन नंबर + साफ पता भरोसा बढ़ाता है।</p>
+      </article>
+    </div>
+
+    <div class="mt-6 grid gap-4 md:grid-cols-2">
+      <article class="rounded-2xl border border-slate-200 bg-white p-5">
+        <h3 data-ui-i18n="v2_before_login_title" class="font-display text-lg font-extrabold text-slate-900">लॉगिन से पहले क्या कर सकते हैं?</h3>
+        <ul class="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-700">
+          <li data-ui-i18n="v2_before_login_1">Items और suppliers category-wise देखें।</li>
+          <li data-ui-i18n="v2_before_login_2">Search (type/voice) से supplier ढूंढें।</li>
+          <li data-ui-i18n="v2_before_login_3">Call/WhatsApp करके तुरंत बात शुरू करें।</li>
+        </ul>
+      </article>
+
+      <article class="rounded-2xl border border-slate-200 bg-white p-5">
+        <h3 data-ui-i18n="v2_after_login_title" class="font-display text-lg font-extrabold text-slate-900">लॉगिन के बाद क्या extra मिलेगा?</h3>
+        <ul class="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-700">
+          <li data-ui-i18n="v2_after_login_1">अपनी बुकिंग status ट्रैक करें।</li>
+          <li data-ui-i18n="v2_after_login_2">Supplier के लिए: प्रोफाइल + items/services manage करें।</li>
+          <li data-ui-i18n="v2_after_login_3">Supplier verification और booking requests dashboard में देखें।</li>
+        </ul>
+      </article>
+    </div>
+
+    <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+      <h3 data-ui-i18n="v2_steps_title" class="font-display text-lg font-extrabold text-slate-900">Step-by-step Use Case</h3>
+      <p data-ui-i18n="v2_steps_desc" class="mt-2 text-sm text-slate-700">
+        OTP login में अलग से register जरूरी नहीं है — पहली बार OTP लेने पर account अपने-आप बन जाता है।
+      </p>
+      <div class="mt-4 grid gap-4 lg:grid-cols-3">
+        <article class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+          <h4 data-ui-i18n="v2_steps_buyer_title" class="font-display text-base font-extrabold text-slate-900">Buyer/User</h4>
+          <ol class="mt-3 space-y-2 text-sm text-slate-700">
+            <li data-ui-i18n="v2_steps_buyer_1">1) Home पर search box में अपनी जरूरत लिखें या voice से बोलें।</li>
+            <li data-ui-i18n="v2_steps_buyer_2">2) नीचे category-wise items में supplier card देखें।</li>
+            <li data-ui-i18n="v2_steps_buyer_3">3) Call/WhatsApp से बात करके price + delivery confirm करें।</li>
+            <li data-ui-i18n="v2_steps_buyer_4">4) Booking status track करने के लिए OTP से login करें (no register needed)।</li>
+          </ol>
+        </article>
+
+        <article class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+          <h4 data-ui-i18n="v2_steps_supplier_title" class="font-display text-base font-extrabold text-slate-900">Supplier</h4>
+          <ol class="mt-3 space-y-2 text-sm text-slate-700">
+            <li data-ui-i18n="v2_steps_supplier_1">1) OTP से Supplier के रूप में login करें।</li>
+            <li data-ui-i18n="v2_steps_supplier_2">2) Supplier Dashboard में प्रोफाइल भरें (business name, phone, address)।</li>
+            <li data-ui-i18n="v2_steps_supplier_3">3) Items/services जोड़ें: item name + unit type (per trip/per day/per bag) + price.</li>
+            <li data-ui-i18n="v2_steps_supplier_4">4) Owner/Admin verification के बाद आपकी listing users को दिखेगी।</li>
+          </ol>
+        </article>
+
+        <article class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+          <h4 data-ui-i18n="v2_steps_admin_title" class="font-display text-base font-extrabold text-slate-900">Owner/Admin</h4>
+          <ol class="mt-3 space-y-2 text-sm text-slate-700">
+            <li data-ui-i18n="v2_steps_admin_1">1) Allowlisted phone से OTP login करें (Owner/Admin)।</li>
+            <li data-ui-i18n="v2_steps_admin_2">2) Admin Dashboard में pending suppliers approve/reject करें।</li>
+            <li data-ui-i18n="v2_steps_admin_3">3) Fraud control: block/unblock, reviews/complaints देखें।</li>
+            <li data-ui-i18n="v2_steps_admin_4">4) Owner settings (Call/WhatsApp enable/disable) manage करें।</li>
+          </ol>
+        </article>
+      </div>
+    </div>
+
+    <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+      <h3 data-ui-i18n="v2_tips_title" class="font-display text-lg font-extrabold text-slate-900">सुरक्षा/टिप्स</h3>
+      <ul class="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-700">
+        <li data-ui-i18n="v2_tips_1">फोन पर कीमत, डिलीवरी समय, और कुल मात्रा पहले confirm करें।</li>
+        <li data-ui-i18n="v2_tips_2">Unknown लिंक/OTP किसी को न दें।</li>
+        <li data-ui-i18n="v2_tips_3">समस्या हो तो ऊपर “Help: Call/WhatsApp” से संपर्क करें।</li>
+      </ul>
+    </div>
+
+    <div class="mt-6 rounded-2xl border border-amber-200 bg-amber-50/70 p-5">
+      <h3 data-ui-i18n="v2_admin_prod_title" class="font-display text-lg font-extrabold text-amber-900">Owner/Admin (Production)</h3>
+      <p data-ui-i18n="v2_admin_prod_desc" class="mt-2 text-sm text-slate-700">Production में Admin role सिर्फ allowlisted नंबरों के लिए है। Admin का काम ऑपरेशन और सुरक्षा है (रोज़मर्रा buyer/supplier use नहीं)।</p>
+      <ul class="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-700">
+        <li data-ui-i18n="v2_admin_prod_1">Supplier verification/review: documents देखकर verify/reject करें।</li>
+        <li data-ui-i18n="v2_admin_prod_2">Suspicious suppliers/users को block/suspend करें।</li>
+        <li data-ui-i18n="v2_admin_prod_3">WhatsApp/Call enable/disable जैसी owner settings नियंत्रित करें।</li>
+      </ul>
+      <p data-ui-i18n="v2_admin_prod_note" class="mt-3 text-xs text-amber-900">Note: Production में `OTP_EXPOSE_IN_RESPONSE=0` रखें और OTP delivery provider (SMS/WhatsApp) configure करें।</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  function quickSearch(term) {
+    const input = document.getElementById("globalSearchInput");
+    if (input) input.value = term;
+    if (typeof runGlobalSearch === "function") runGlobalSearch();
+  }
+</script>
+{% endblock %}

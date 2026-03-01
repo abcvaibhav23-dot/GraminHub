@@ -289,6 +289,9 @@ def get_admin_site_settings(
         show_supplier_phone=data["show_supplier_phone"],
         enable_supplier_call=data["enable_supplier_call"],
         enable_supplier_whatsapp=data["enable_supplier_whatsapp"],
+        public_support_email=str(data.get("public_support_email") or ""),
+        public_support_phone=str(data.get("public_support_phone") or ""),
+        public_support_whatsapp=str(data.get("public_support_whatsapp") or ""),
     )
 
 
@@ -299,18 +302,39 @@ def update_admin_site_settings(
     db: Session = Depends(get_db),
 ) -> SiteSettingsOut:
     seed_site_settings(db)
-    updates: dict[str, bool] = {}
+    updates: dict[str, object] = {}
     if payload.show_supplier_phone is not None:
         updates["show_supplier_phone"] = payload.show_supplier_phone
     if payload.enable_supplier_call is not None:
         updates["enable_supplier_call"] = payload.enable_supplier_call
     if payload.enable_supplier_whatsapp is not None:
         updates["enable_supplier_whatsapp"] = payload.enable_supplier_whatsapp
+
+    def _clean_contact(value: str | None, max_len: int = 100) -> str | None:
+        if value is None:
+            return None
+        cleaned = " ".join(value.strip().split())
+        if not cleaned:
+            return ""
+        if len(cleaned) > max_len:
+            raise HTTPException(status_code=400, detail="Contact value is too long")
+        return cleaned
+
+    if payload.public_support_email is not None:
+        updates["public_support_email"] = _clean_contact(payload.public_support_email, max_len=120) or ""
+    if payload.public_support_phone is not None:
+        updates["public_support_phone"] = _clean_contact(payload.public_support_phone, max_len=30) or ""
+    if payload.public_support_whatsapp is not None:
+        updates["public_support_whatsapp"] = _clean_contact(payload.public_support_whatsapp, max_len=30) or ""
+
     data = update_site_settings(db, updates)
     return SiteSettingsOut(
         show_supplier_phone=data["show_supplier_phone"],
         enable_supplier_call=data["enable_supplier_call"],
         enable_supplier_whatsapp=data["enable_supplier_whatsapp"],
+        public_support_email=str(data.get("public_support_email") or ""),
+        public_support_phone=str(data.get("public_support_phone") or ""),
+        public_support_whatsapp=str(data.get("public_support_whatsapp") or ""),
     )
 
 
